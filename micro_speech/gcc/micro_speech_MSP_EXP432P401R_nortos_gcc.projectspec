@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="MSP432"
+                deviceId="MSP432P401R"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Micro Speech"
+        name="micro_speech"
+        configurations="Debug"
+        toolChain="GNU"
+        connection="TIXDS110_Connection.xml"
+        device="MSP432P401R"
+        ignoreDefaultDeviceSettings="true"
+        ignoreDefaultCCSSettings="true"
+        products="com.ti.SIMPLELINK_MSP432_SDK"
+        compilerBuildOptions="
+            -I${PROJECT_ROOT}
+            -I${PROJECT_ROOT}/${ConfigName}
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/third_party/CMSIS/Include
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos/posix
+            -mcpu=cortex-m4
+            -march=armv7e-m
+            -mthumb
+            -std=c99
+            -std=c++11
+            -mfloat-abi=hard
+            -mfpu=fpv4-sp-d16
+            -ffunction-sections
+            -fdata-sections
+            -g
+            -gstrict-dwarf
+            -Wall
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include/newlib-nano
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include
+            -I${PROJECT_ROOT}/components/tfmicro/third_party/kissfft
+            -I${PROJECT_ROOT}/components/tfmicro
+            -I${PROJECT_ROOT}/components/tfmicro/third_party/gemmlowp
+            -I${PROJECT_ROOT}/components/tfmicro/third_party/flatbuffers/include
+            -I${PROJECT_ROOT}/components/tfmicro/third_party/ruy
+            -O3
+            -flto
+	    -fno-strict-aliasing
+	    -DNDEBUG
+	    -DTF_LITE_STATIC_MEMORY	
+        "
+        linkerBuildOptions="
+            -nostartfiles
+            -L${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source
+            -l:ti/display/lib/display.am4fg
+            -l:ti/grlib/lib/gcc/m4f/grlib.a
+            -l:third_party/spiffs/lib/gcc/m4f/spiffs.a
+            -l:ti/drivers/lib/drivers_msp432p401x.am4fg
+            -l:third_party/fatfs/lib/gcc/m4f/fatfs.a
+            -eresetISR
+            -L${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos
+            -l:lib/nortos_msp432p401x.am4fg
+            -l:ti/devices/msp432p4xx/driverlib/gcc/msp432p4xx_driverlib.a
+            -march=armv7e-m
+            -mthumb
+            -mfloat-abi=hard
+            -mfpu=fpv4-sp-d16
+            -static
+            -Wl,--gc-sections
+            -L${CG_TOOL_ROOT}/arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard
+            -lgcc
+            -lc
+            -lm
+            -lnosys
+            -lstdc++
+            -flto
+            --specs=nano.specs
+        "
+        enableSysConfigTool="true"
+        sysConfigBuildOptions="
+            --product ${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/.metadata/product.json
+        "
+        description="Echoes characters back using the UART driver">
+
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <group id="micro_speech.SIMPLELINK_MSP432_SDK.MSP_EXP432P401R.drivers.GCC"/>
+        <file path="../micro_speech.c" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../README.md" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../README.html" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../main_nortos.c" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../micro_speech.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/boards/MSP_EXP432P401R/Board.html" openOnCreation="false" excludeFromBuild="false" action="link">
+        </file>
+        <file path="../gcc/MSP_EXP432P401R_NoRTOS.lds" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+    </project>
+</projectSpec>
