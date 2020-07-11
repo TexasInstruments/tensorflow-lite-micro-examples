@@ -79,7 +79,7 @@ void adcBufCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion,
 }
 
 void respondToCommand(int32_t current_time, const char* found_command, uint8_t score) {
-    Display_printf(displayHandle, 0, 0, "Heard %s (%d) @%dms", found_command, score, current_time);
+    //Display_printf(displayHandle, 0, 0, "Heard %s (%d) @%dms", found_command, score, current_time);
 
     if (strcmp(found_command, "yes") == 0) {
         LED_setOff(redLedHandle);
