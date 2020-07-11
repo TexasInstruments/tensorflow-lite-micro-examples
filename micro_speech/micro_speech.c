@@ -95,6 +95,11 @@ void respondToCommand(int32_t current_time, const char* found_command, uint8_t s
     }
 }
 
+void debugDisplayPrint(const char *s)
+{
+    Display_printf(displayHandle, 0, 0, s);
+}
+
 
 /*
  *  ======== mainThread ========
