@@ -61,6 +61,7 @@ void *mainThread(void *arg0)
     Display_init();
 
     /* Configure & open Display driver */
+    Display_Params displayParams;
     Display_Params_init(&displayParams);
     displayParams.lineClearMode = DISPLAY_CLEAR_BOTH;
 
