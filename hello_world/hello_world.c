@@ -31,7 +31,7 @@
  */
 
 /*
- *  ======== micro_speech.c ========
+ *  ======== hello_world.c ========
  */
 #include <stdint.h>
 #include <stddef.h>

@@ -87,8 +87,8 @@
 
         <property name="buildProfile" value="release"/>
         <property name="isHybrid" value="true"/>
-        <group id="micro_speech.SIMPLELINK_MSP432_SDK.MSP_EXP432P401R.drivers.GCC"/>
-        <file path="../micro_speech.c" openOnCreation="false" excludeFromBuild="false" action="copy">
+        <group id="hello_world.SIMPLELINK_MSP432_SDK.MSP_EXP432P401R.drivers.GCC"/>
+        <file path="../hello_world.c" openOnCreation="false" excludeFromBuild="false" action="copy">
         </file>
         <file path="../README.md" openOnCreation="false" excludeFromBuild="false" action="copy">
         </file>
@@ -96,7 +96,7 @@
         </file>
         <file path="../main_nortos.c" openOnCreation="false" excludeFromBuild="false" action="copy">
         </file>
-        <file path="../micro_speech.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
+        <file path="../hello_world.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
         </file>
         <file path="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/boards/MSP_EXP432P401R/Board.html" openOnCreation="false" excludeFromBuild="false" action="link">
         </file>
