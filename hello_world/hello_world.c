@@ -48,6 +48,11 @@
 
 Display_Handle displayHandle;
 
+void debugDisplayPrint(const char *s)
+{
+    Display_printf(displayHandle, 0, 0, s);
+}
+
 
 /*
  *  ======== mainThread ========
