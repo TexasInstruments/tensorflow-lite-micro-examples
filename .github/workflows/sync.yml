@@ -1,0 +1,33 @@
+# YAML schema for GitHub Actions:
+# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
+#
+# Helpful YAML parser to clarify YAML syntax:
+# https://yaml-online-parser.appspot.com/
+#
+
+name: Sync test
+
+on:
+  schedule:
+    # 10am UTC is 3am or 4am PT depending on daylight savings.
+    - cron: '0 10 * * *'
+
+  # Allow manually triggering of the workflow.
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'schedule' && github.repository == 'tensorflow/tflite-micro-arduino-examples')
+    steps:
+      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.TFLM_BOT_REPO_TOKEN }}
+
+      - name: Sync the code
+        run: |
+         echo "Testing 123"
