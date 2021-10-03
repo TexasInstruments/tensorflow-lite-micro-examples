@@ -22,6 +22,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
+          git rev-parse HEAD
           buf=$(curl "https://api.github.com/repos/TexasInstruments/tensorflow-lite-micro-examples/statuses/$(git rev-parse HEAD)")
           if [ $? != 0 ]; then
               exit 1
