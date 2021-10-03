@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
 
-          token: ${{ secrets.REPO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync the code
         run: |
@@ -51,7 +51,7 @@ jobs:
         with:
           branch: sync-from-tflite-micro
           delete-branch: true
-          token: ${{ secrets.REPO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           title: (TI) Automated sync from github.com/tensorflow/tflite-micro
           commit-message: Automated sync from github.com/tensorflow/tflite-micro
           body: "(TI) Automated sync from github.com/tensorflow/tflite-micro"
