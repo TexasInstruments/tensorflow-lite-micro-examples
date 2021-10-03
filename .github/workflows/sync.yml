@@ -21,7 +21,6 @@ jobs:
 
     if: |
       github.event_name == 'workflow_dispatch' ||
-
       (github.event_name == 'schedule' && github.repository == 'TexasInstruments/tensorflow-lite-micro-examples')
 
     steps:
@@ -34,7 +33,7 @@ jobs:
       - name: Sync the code
         run: |
           pip3 install Pillow Wave
-          bash ./scripts/sync_from_tflite_micro.sh
+          ./scripts/sync_from_tflite_micro.sh
           git config --local user.name "TI-AviBerko"
           git config --local user.email "avi@ti.com"
           git add *
