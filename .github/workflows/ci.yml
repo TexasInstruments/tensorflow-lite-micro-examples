@@ -22,5 +22,13 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
-          echo Hello, world!
+          buf=$(curl "https://api.github.com/repos/TexasInstruments/tensorflow-lite-micro-examples/statuses/$(git rev-parse HEAD)")
+          if [ $buf != 0 ]; then
+              exit 1
+          fi
+          state = $(echo $buf | python3 -c "import json;print(json.loads(input())[0]['state'])")
+          if [ $state == "success" ]; then
+              exit 0
+          fi
           exit 1
+          
