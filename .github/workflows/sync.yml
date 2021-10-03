@@ -5,12 +5,12 @@
 # https://yaml-online-parser.appspot.com/
 #
 
-name: Sync test
+name: Sync from tflite-micro
 
 on:
   schedule:
-    # 10am UTC is 3am or 4am PT depending on daylight savings.
-    - cron: '0 10 * * *'
+    # 2pm UTC is 7am or 8am PT depending on daylight savings.
+    - cron: '0 14 * * *'
 
   # Allow manually triggering of the workflow.
   workflow_dispatch: {}
@@ -21,13 +21,38 @@ jobs:
 
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'schedule' && github.repository == 'tensorflow/tflite-micro-arduino-examples')
+
+      (github.event_name == 'schedule' && github.repository == 'TexasInstruments/tensorflow-lite-micro-examples')
+
     steps:
       - uses: actions/setup-python@v2
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.TFLM_BOT_REPO_TOKEN }}
+
+          token: ${{ secrets.REPO_TOKEN }}
 
       - name: Sync the code
         run: |
-         echo "Testing 123"
+          pip3 install Pillow Wave
+          ./scripts/sync_from_tflite_micro.sh
+          git config --local user.name "TI-AviBerko"
+          git config --local user.email "avi@ti.com"
+          git add *
+
+          if [[ $(git status --porcelain | wc -l) == 0 ]]; then
+            echo "no changes"
+          else
+            git commit -m "Sync from tflite-micro."
+          fi
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@052fc72b4198ba9fbc81b818c6e1859f747d49a8
+        with:
+          branch: sync-from-tflite-micro
+          delete-branch: true
+          token: ${{ secrets.REPO_TOKEN }}
+          title: (TI) Automated sync from github.com/tensorflow/tflite-micro
+          commit-message: Automated sync from github.com/tensorflow/tflite-micro
+          body: "(TI) Automated sync from github.com/tensorflow/tflite-micro"
+          labels: ci:run

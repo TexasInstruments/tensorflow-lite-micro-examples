@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="ARM"
+                deviceId="Cortex M.CC3235SF"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Hello World"
+        name="hello_world_CC3235SF_LAUNCHXL_nortos_gcc"
+        configurations="Debug"
+        toolChain="GNU"
+        connection="TIXDS110_Connection.xml"
+        device="Cortex M.CC3235SF"
+        ignoreDefaultDeviceSettings="true"
+        ignoreDefaultCCSSettings="true"
+        products="com.ti.SIMPLELINK_CC32XX_SDK;sysconfig"
+        compilerBuildOptions="
+            -I${PROJECT_ROOT}
+            -I${PROJECT_ROOT}/${ConfigName}
+            -I${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source
+            -DNORTOS_SUPPORT
+            -I${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/nortos
+            -I${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/nortos/posix
+            -mcpu=cortex-m4
+            -march=armv7e-m
+            -mthumb
+            -std=c11
+            -std=c++11
+            -mfloat-abi=soft
+            -ffunction-sections
+            -fdata-sections
+            -g
+            -gstrict-dwarf
+            -Wall
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include/newlib-nano
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include
+            -I${workspace_loc:/${ProjName}/third_party/kissfft}
+            -I${workspace_loc:/${ProjName}/third_party/gemmlowp}
+            -I${workspace_loc:/${ProjName}/third_party/flatbuffers/include}
+            -I${workspace_loc:/${ProjName}/third_party/ruy}
+            -I${workspace_loc:/${ProjName}/hello_world}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/Core/Include}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/DSP/Include}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/NN/Include}
+            -O3
+            -flto
+            -fno-strict-aliasing
+            -fno-exceptions
+            -fno-rtti
+            -DNDEBUG
+            -DTF_LITE_STATIC_MEMORY
+            -DCMSIS_NN
+        "
+        linkerBuildOptions="
+            -L${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source
+            -eresetISR
+            -L${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/nortos
+            -L${PROJECT_BUILD_DIR}/syscfg/
+            -lti_utils_build_linker.cmd.genlibs
+            -l:ti/devices/cc32xx/driverlib/gcc/Release/driverlib.a
+            -march=armv7e-m
+            -mthumb
+            -nostartfiles
+            -static
+            -Wl,--gc-sections
+            -L${CG_TOOL_ROOT}/arm-none-eabi/lib/thumb/v7e-m/nofp
+            -lgcc
+            -lc
+            -lm
+            -lnosys
+            -lstdc++
+            -flto
+            --specs=nano.specs
+        "
+        enableHexTool="true"
+        hexBuildOptions="-O binary"
+        enableSysConfigTool="true"
+        sysConfigBuildOptions="
+            --product ${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/.metadata/product.json
+            --compiler gcc
+        "
+        description="Tensorflow Lite Micro Hello World">
+
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <file path="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/boards/CC3235SF_LAUNCHXL/Board.html" openOnCreation="false" excludeFromBuild="false" action="link">
+        </file>
+        <file path="../../../../tensorflow" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../../../third_party" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../../../examples/hello_world" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../main.cc" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../main_nortos.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../hello_world.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../hello_world.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../gcc/cc32xxsf_nortos.lds" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+    </project>
+</projectSpec>
