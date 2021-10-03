@@ -6,6 +6,7 @@
 |   Build Type  |  Status  |
 | -----------   |  --------- |
 | Sync from tflite-micro | [![Sync from tflite-micro](https://github.com/TexasInstruments/tensorflow-lite-micro-examples/actions/workflows/sync.yml/badge.svg)](https://github.com/TexasInstruments/tensorflow-lite-micro-examples/actions/workflows/sync.yml)
+| CCS on Linux  | [![TI](https://github.com/TexasInstruments/tensorflow-lite-micro-examples/actions/workflows/ci.yml/badge.svg?event=status)](https://github.com/TexasInstruments/tensorflow-lite-micro-examples/actions/workflows/ci.yml)
 
 
 ## Getting Started
