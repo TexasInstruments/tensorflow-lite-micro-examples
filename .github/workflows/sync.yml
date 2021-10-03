@@ -21,12 +21,14 @@ jobs:
 
     if: |
       github.event_name == 'workflow_dispatch' ||
+
       (github.event_name == 'schedule' && github.repository == 'TexasInstruments/tensorflow-lite-micro-examples')
 
     steps:
       - uses: actions/setup-python@v2
       - uses: actions/checkout@v2
         with:
+
           token: ${{ secrets.REPO_TOKEN }}
 
       - name: Sync the code
