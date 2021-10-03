@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="MSP432"
+                deviceId="MSP432P401R"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Hello World"
+        name="hello_world_MSP_EXP432P401R_nortos_gcc"
+        configurations="Debug"
+        toolChain="GNU"
+        connection="TIXDS110_Connection.xml"
+        device="MSP432P401R"
+        ignoreDefaultDeviceSettings="true"
+        ignoreDefaultCCSSettings="true"
+        products="com.ti.SIMPLELINK_MSP432_SDK"
+        compilerBuildOptions="
+            -I${PROJECT_ROOT}
+            -I${PROJECT_ROOT}/${ConfigName}
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos/posix
+            -mcpu=cortex-m4
+            -march=armv7e-m
+            -mthumb
+            -std=c11
+            -std=c++11
+            -mfloat-abi=hard
+            -mfpu=fpv4-sp-d16
+            -ffunction-sections
+            -fdata-sections
+            -g
+            -gstrict-dwarf
+            -Wall
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include/newlib-nano
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include
+            -I${CG_TOOL_ROOT}/arm-none-eabi/include
+            -I${workspace_loc:/${ProjName}/third_party/kissfft}
+            -I${workspace_loc:/${ProjName}/third_party/gemmlowp}
+            -I${workspace_loc:/${ProjName}/third_party/flatbuffers/include}
+            -I${workspace_loc:/${ProjName}/third_party/ruy}
+            -I${workspace_loc:/${ProjName}/hello_world}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/Core/Include}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/DSP/Include}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/NN/Include}
+            -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/third_party/CMSIS/Include
+            -O3
+            -flto
+            -fno-strict-aliasing
+            -fno-exceptions
+            -fno-rtti
+            -DNDEBUG
+            -DTF_LITE_STATIC_MEMORY
+            -DCMSIS_NN
+        "
+        linkerBuildOptions="
+            -nostartfiles
+            -L${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source
+            -l:ti/display/lib/display.am4fg
+            -l:ti/grlib/lib/gcc/m4f/grlib.a
+            -l:third_party/spiffs/lib/gcc/m4f/spiffs.a
+            -l:ti/drivers/lib/drivers_msp432p401x.am4fg
+            -l:third_party/fatfs/lib/gcc/m4f/fatfs.a
+            -eresetISR
+            -L${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/kernel/nortos
+            -l:lib/nortos_msp432p401x.am4fg
+            -l:ti/devices/msp432p4xx/driverlib/gcc/msp432p4xx_driverlib.a
+            -march=armv7e-m
+            -mthumb
+            -mfloat-abi=hard
+            -mfpu=fpv4-sp-d16
+            -static
+            -Wl,--gc-sections
+            -L${CG_TOOL_ROOT}/arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard
+            -lgcc
+            -lc
+            -lm
+            -lnosys
+            -lstdc++
+            -flto
+            --specs=nano.specs
+        "
+        enableSysConfigTool="true"
+        sysConfigBuildOptions="
+            --product ${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/.metadata/product.json
+        "
+        description="Tensorflow Lite Micro Hello World">
+
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <group id="micro_speech.SIMPLELINK_MSP432_SDK.MSP_EXP432P401R.drivers.GCC"/>
+        <file path="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/boards/MSP_EXP432P401R/Board.html" openOnCreation="false" excludeFromBuild="false" action="link">
+        </file>
+        <file path="../../../../tensorflow" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../../../third_party" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../../../examples/hello_world" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../main.cc" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../main_nortos.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../hello_world.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../hello_world.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="../gcc/MSP_EXP432P401R_NoRTOS.lds" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+    </project>
+</projectSpec>

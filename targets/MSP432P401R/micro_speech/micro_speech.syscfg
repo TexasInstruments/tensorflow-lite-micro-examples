@@ -1,0 +1,79 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/MSP_EXP432P401R" --product "simplelink_msp432p4_sdk@3.40.01.02"
+ * @versions {"data":"2020021217","timestamp":"2020021217","tool":"1.4.0+1234","templates":"2020021217"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const Display  = scripting.addModule("/ti/display/Display", {}, false);
+const Display1 = Display.addInstance();
+const ADCBuf   = scripting.addModule("/ti/drivers/ADCBuf", {}, false);
+const ADCBuf1  = ADCBuf.addInstance();
+const GPIO     = scripting.addModule("/ti/drivers/GPIO");
+const GPIO1    = GPIO.addInstance();
+const GPIO2    = GPIO.addInstance();
+const RTOS     = scripting.addModule("/ti/drivers/RTOS");
+const LED      = scripting.addModule("/ti/drivers/apps/LED", {}, false);
+const LED1     = LED.addInstance();
+const LED2     = LED.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+Display1.$name           = "CONFIG_Display_0";
+Display1.$hardware       = system.deviceData.board.components.XDS110UART;
+Display1.uart.$name      = "CONFIG_UART_0";
+Display1.uart.uart.$name = "MyUART1";
+
+ADCBuf1.$name                             = "CONFIG_ADCBUF_0";
+ADCBuf1.timer.$name                       = "MyTIMER_A1";
+ADCBuf1.adc.$name                         = "MyADC141";
+ADCBuf1.adcBufChannel0.$name              = "_CHANNEL_0";
+ADCBuf1.adcBufChannel0.adc.$name          = "MyADC141";
+ADCBuf1.adcBufChannel0.adc.adcPin.$assign = "boosterpack.6";
+
+GPIO1.$hardware = system.deviceData.board.components.LED1_RED;
+GPIO1.$name     = "CONFIG_GPIO_LED_0";
+
+GPIO2.$name              = "CONFIG_GPIO_0";
+GPIO2.mode               = "Output";
+GPIO2.outputStrength     = "High";
+GPIO2.initialOutputState = "High";
+GPIO2.pull               = "Pull Up";
+GPIO2.gpioPin.$assign    = "boosterpack.5";
+
+const Power                   = scripting.addModule("/ti/drivers/Power", {}, false);
+Power.performanceLevel3.$name = "ti_drivers_power_PowerMSP432PerfLevels0";
+Power.performanceLevel2.$name = "ti_drivers_power_PowerMSP432PerfLevels1";
+Power.performanceLevel1.$name = "ti_drivers_power_PowerMSP432PerfLevels2";
+Power.performanceLevel0.$name = "ti_drivers_power_PowerMSP432PerfLevels3";
+
+RTOS.name                  = "NoRTOS";
+RTOS.timer0.resource.$name = "MyTIMER_A1";
+
+LED1.$name     = "CONFIG_LED_0";
+LED1.$hardware = system.deviceData.board.components.LED2_RED;
+
+LED2.$name     = "CONFIG_LED_1";
+LED2.$hardware = system.deviceData.board.components.LED2_GREEN;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+Display1.uart.uart.$suggestSolution             = "EUSCI_A0";
+Display1.uart.uart.txPin.$suggestSolution       = "7";
+Display1.uart.uart.rxPin.$suggestSolution       = "6";
+ADCBuf1.timer.$suggestSolution                  = "Timer_A1";
+ADCBuf1.adc.$suggestSolution                    = "ADC14";
+ADCBuf1.adc.dmaInterruptNumber.$suggestSolution = "DMA_INT0";
+ADCBuf1.adc.dmaChannel.$suggestSolution         = "DMA_CH7";
+ADCBuf1.adcBufChannel0.adc.$suggestSolution     = "ADC14";
+GPIO1.gpioPin.$suggestSolution                  = "4";
+RTOS.timer0.resource.$suggestSolution           = "Timer_A0";
+LED1.gpioPin.gpioPin.$suggestSolution           = "16";
+LED2.gpioPin.gpioPin.$suggestSolution           = "17";
