@@ -50,7 +50,7 @@
             -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/DSP/Include}
             -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/NN/Include}
             -I${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/third_party/CMSIS/Include
-            -O3
+            -Os
             -flto
             -fno-strict-aliasing
             -fno-exceptions
