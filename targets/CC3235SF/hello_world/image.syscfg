@@ -1,8 +1,8 @@
 /**
  * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
  * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
- * @cliArgs --device "CC3235SF" --package "Default" --part "Default" --ccxxImageMode --product "simplelink_cc32xx_sdk@5_30_00_02_eng"
- * @versions {"data":"2020052512","timestamp":"2020052512","tool":"1.9.0","templates":"2020052512"}
+ * @cliArgs --device "CC3235SF" --package "Default" --part "Default" --ccxxImageMode --product "simplelink_cc32xx_sdk@5.30.00.03_eng"
+ * @versions {"tool":"1.10.0+2163"}
  */
 
 /**
@@ -11,11 +11,9 @@
 const General     = scripting.addModule("/ti/drivers/net/imagecreator/new_design/Device/General");
 const Ota         = scripting.addModule("/ti/drivers/net/imagecreator/new_design/Device/Ota");
 const Network     = scripting.addModule("/ti/drivers/net/imagecreator/new_design/NetworkServices/Network");
-const CertStore   = scripting.addModule("/ti/drivers/net/imagecreator/new_design/UserFiles/CertStore");
 const MCUImage    = scripting.addModule("/ti/drivers/net/imagecreator/new_design/UserFiles/MCUImage");
 const ServicePack = scripting.addModule("/ti/drivers/net/imagecreator/new_design/UserFiles/ServicePack");
 const fileTree    = scripting.addModule("/ti/drivers/net/imagecreator/new_design/UserFiles/fileTree");
-const fileTree1   = fileTree.addInstance();
 const Mac         = scripting.addModule("/ti/drivers/net/imagecreator/new_design/WiFi/Mac");
 const Radio       = scripting.addModule("/ti/drivers/net/imagecreator/new_design/WiFi/Radio");
 
@@ -23,7 +21,5 @@ const Radio       = scripting.addModule("/ti/drivers/net/imagecreator/new_design
  * Write custom configuration values to the imported modules.
  */
 General.ModeSelect = "development";
-fileTree.rootDirCfg = "userFiles";
-fileTree1.$name       = "ti_drivers_net_imagecreator_new_design_UserFiles_fileTree0";
-fileTree1.filePathCfg = scripting.forceWrite("dummy-root-ca-cert");
 
+fileTree.rootDirCfg = "userFiles";

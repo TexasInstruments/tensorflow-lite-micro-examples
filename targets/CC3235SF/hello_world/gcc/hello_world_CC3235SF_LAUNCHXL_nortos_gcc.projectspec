@@ -122,9 +122,11 @@
         </file>
         <file path="../hello_world.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
         </file>
-	<file path="../image.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
-	</file>
+	    <file path="../image.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
+	    </file>
         <file path="../gcc/cc32xxsf_nortos.lds" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="hello_world">
+        </file>
+        <file path="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/examples/nortos/CC3235SF_LAUNCHXL/demos/power_measurement/userFiles/dummy-root-ca-cert" targetDirectory="./userFiles/" openOnCreation="false" excludeFromBuild="false" action="copy">
         </file>
     </project>
 </projectSpec>
