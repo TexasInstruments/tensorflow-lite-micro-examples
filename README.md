@@ -30,7 +30,7 @@ Software requirements:
 2. Download and install the latest **MSP432P401R** SDK ([instructions](https://www.ti.com/tool/download/SIMPLELINK-MSP432-SDK))
 3. Install the GCC toolchain
     1. Launch Code Composer Studio
-    2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - afterwhich the main IDE windows will become visible
+    2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - after which the main IDE windows will become visible
     3. Go to the Help menu and select - Install GCC ARM Compiler Tools… -> a window titled "Install" will open
     - On the bottom, uncheck "Show only the latest versions of available software"
     - In the middle, expand the "ARM GCC Tools" tree
@@ -42,7 +42,7 @@ Software requirements:
 Generate, build and flash the project:
 
 1. Launch Code Composer Studio
-2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - afterwhich the main IDE windows will become visible
+2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - after which the main IDE windows will become visible
 3. In the main menu, choose Tools->Import CCS Projects...
 4. In the "Import CCS Projects" dialog, put the path to the repository in the "Select search-directory" field with the correct target - e.g. ~/repos/tensorflow-lite-micro-examples/targets/MSP432R01
 5. The "Discovery Projects" list should become populated with the available projects
@@ -83,7 +83,7 @@ Software requirements:
 2. Download and install the latest **CC32XX** SDK ([instructions](https://www.ti.com/tool/SIMPLELINK-CC32XX-SDK))
 3. Install the GCC toolchain
     1. Launch Code Composer Studio
-    2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch" - afterwhich the main IDE windows will become visible
+    2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch" - after which the main IDE windows will become visible
     3. Go to the Help menu and select - Install GCC ARM Compiler Tools… -> a window titled "Install" will open
     - On the bottom, uncheck "Show only the latest versions of available software"
     - In the middle, expand the "ARM GCC Tools" tree
@@ -95,7 +95,7 @@ Software requirements:
 Generate, build and flash the project:
 
 1. Launch Code Composer Studio
-2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - afterwhich the main IDE windows will become visible
+2. When prompted for a workspace directory, provide a new directory name to create a new workspace (or select an existing workspace directory), and press "Launch"  - after which the main IDE windows will become visible
 3. In the main menu, choose Tools->Import CCS Projects...
 4. In the "Import CCS Projects" dialog, put the path to the repository in the "Select search-directory" field with the correct target - e.g. ~/repos/tensorflow-lite-micro-examples/targets/CC32XXSF
 5. The "Discovery Projects" list should become populated with the available projects
