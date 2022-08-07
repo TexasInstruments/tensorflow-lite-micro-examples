@@ -39,7 +39,7 @@ ARM_CPU=4
 # Create the TFLM base tree
 python3 tensorflow/lite/micro/tools/project_generation/create_tflm_tree.py \
   -e hello_world -e magic_wand -e micro_speech -e person_detection \
-  --makefile_options="TARGET=${TARGET} OPTIMIZED_KERNEL_DIR=${OPTIMIZED_KERNEL_DIR} ARM_CPU=${ARM_CPU}" \
+  --makefile_options="TARGET=${TARGET} OPTIMIZED_KERNEL_DIR=${OPTIMIZED_KERNEL_DIR} ARM_CPU=${ARM_CPU} TARGET_ARCH=${TARGET_ARCH}" \
   "${TEMP_DIR}/tflm-out"
 
 cd "${ROOT_DIR}"
