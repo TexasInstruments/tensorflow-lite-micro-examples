@@ -53,6 +53,6 @@ rm -rf tensorflow/lite/micro/models
 
 # Copy the CMSIS Device include directory, for some reason this is not the create_tflm_tree.py ...
 mkdir -p third_party/cmsis/Device/ARM/ARMCM${ARM_CPU}/Include
-cp -r "${TEMP_DIR}"/tensorflow/lite/micro/tools/make/downloads/cmsis/Device/ARM/ARMCM${ARM_CPU}/ third_party/cmsis/Device/ARM/ARMCM${ARM_CPU}
+cp -r "${TEMP_DIR}"/tflite-micro/tensorflow/lite/micro/tools/make/downloads/cmsis/Device/ARM/ARMCM${ARM_CPU}/Include third_party/cmsis/Device/ARM/ARMCM${ARM_CPU}
 
 rm -rf "${TEMP_DIR}"
