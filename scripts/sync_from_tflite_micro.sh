@@ -32,13 +32,14 @@ cd tflite-micro
 
 TARGET=cortex_m_generic
 OPTIMIZED_KERNEL_DIR=cmsis_nn
-TARGET_ARCH=cortex-m4
+#TARGET_ARCH=cortex-m4
+ARM_CPU=4
 
 
 # Create the TFLM base tree
 python3 tensorflow/lite/micro/tools/project_generation/create_tflm_tree.py \
   -e hello_world -e magic_wand -e micro_speech -e person_detection \
-  --makefile_options="TARGET=${TARGET} OPTIMIZED_KERNEL_DIR=${OPTIMIZED_KERNEL_DIR} TARGET_ARCH=${TARGET_ARCH}" \
+  --makefile_options="TARGET=${TARGET} OPTIMIZED_KERNEL_DIR=${OPTIMIZED_KERNEL_DIR} ARM_CPU=${ARM_CPU}" \
   "${TEMP_DIR}/tflm-out"
 
 cd "${ROOT_DIR}"
