@@ -32,7 +32,7 @@ cd tflite-micro
 
 TARGET=cortex_m_generic
 OPTIMIZED_KERNEL_DIR=cmsis_nn
-#TARGET_ARCH=cortex-m4
+TARGET_ARCH=cortex-m4
 ARM_CPU=4
 
 
