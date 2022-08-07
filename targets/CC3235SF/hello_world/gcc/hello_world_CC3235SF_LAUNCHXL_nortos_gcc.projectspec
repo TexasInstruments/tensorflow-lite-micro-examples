@@ -48,6 +48,7 @@
             -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/Core/Include}
             -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/DSP/Include}
             -I${workspace_loc:/${ProjName}/third_party/cmsis/CMSIS/NN/Include}
+            -I${workspace_loc:/${ProjName}/third_party/cmsis/Device/ARM/ARMCM4/Include}
             -O3
             -flto
             -fno-strict-aliasing
@@ -57,6 +58,7 @@
             -DTF_LITE_STATIC_MEMORY
             -DCMSIS_NN
             -DDeviceFamily_CC3220
+            -DCMSIS_DEVICE_ARM_CORTEX_M_XX_HEADER_FILE=\&quot;ARMCM4.h\&quot;
         "
         linkerBuildOptions="
             -L${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source
