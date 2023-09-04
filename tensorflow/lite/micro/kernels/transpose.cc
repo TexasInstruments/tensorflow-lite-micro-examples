@@ -116,7 +116,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 
 }  // namespace
 
-TfLiteRegistration_V1 Register_TRANSPOSE() {
+TfLiteRegistration Register_TRANSPOSE() {
   return tflite::micro::RegisterOp(nullptr, Prepare, Eval);
 }
 }  // namespace tflite

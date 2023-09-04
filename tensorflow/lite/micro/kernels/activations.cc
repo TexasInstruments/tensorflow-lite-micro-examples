@@ -109,11 +109,11 @@ TfLiteStatus Relu6Eval(TfLiteContext* context, TfLiteNode* node) {
 
 }  // namespace
 
-TfLiteRegistration_V1 Register_RELU() {
+TfLiteRegistration Register_RELU() {
   return tflite::micro::RegisterOp(ReluInit, ReluPrepare, ReluEval);
 }
 
-TfLiteRegistration_V1 Register_RELU6() {
+TfLiteRegistration Register_RELU6() {
   return tflite::micro::RegisterOp(Relu6Init, Relu6Prepare, Relu6Eval);
 }
 

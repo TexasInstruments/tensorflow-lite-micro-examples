@@ -1,4 +1,4 @@
-/* Copyright 2023 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,11 @@ limitations under the License.
 #include <cstdint>
 
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/api/flatbuffer_conversions.h"
+#include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/core/api/tensor_utils.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/micro/arena_allocator/non_persistent_arena_buffer_allocator.h"
 #include "tensorflow/lite/micro/arena_allocator/persistent_arena_buffer_allocator.h"
@@ -31,8 +35,8 @@ limitations under the License.
 #include "tensorflow/lite/micro/memory_planner/micro_memory_planner.h"
 #include "tensorflow/lite/micro/micro_allocation_info.h"
 #include "tensorflow/lite/micro/micro_arena_constants.h"
+#include "tensorflow/lite/micro/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_log.h"
-#include "tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/schema/schema_utils.h"
 
@@ -50,7 +54,7 @@ constexpr int kUnassignedScratchBufferRequestIndex = -1;
 
 const TfLiteIntArray kZeroLengthIntArray = {};
 
-class MicroBuiltinDataAllocator : public TfLiteBridgeBuiltinDataAllocator {
+class MicroBuiltinDataAllocator : public BuiltinDataAllocator {
  public:
   explicit MicroBuiltinDataAllocator(
       IPersistentBufferAllocator* persistent_allocator)
@@ -201,8 +205,9 @@ TfLiteStatus InitializeTfLiteTensorFromFlatbuffer(
   *result = {};
   // Make sure the serialized type is one we know how to deal with, and convert
   // it from a flatbuffer enum into a constant used by the kernel C API.
-  TF_LITE_ENSURE_STATUS(
-      tflite::ConvertTensorType(flatbuffer_tensor.type(), &result->type));
+  TF_LITE_ENSURE_STATUS(ConvertTensorType(flatbuffer_tensor.type(),
+                                          &result->type,
+                                          tflite::GetMicroErrorReporter()));
   // Make sure we remember if the serialized tensor is designated as a variable.
   result->is_variable = flatbuffer_tensor.is_variable();
 
@@ -317,8 +322,9 @@ TfLiteStatus InitializeTfLiteEvalTensorFromFlatbuffer(
   *result = {};
   // Make sure the serialized type is one we know how to deal with, and convert
   // it from a flatbuffer enum into a constant used by the kernel C API.
-  TF_LITE_ENSURE_STATUS(
-      tflite::ConvertTensorType(flatbuffer_tensor.type(), &result->type));
+  TF_LITE_ENSURE_STATUS(ConvertTensorType(flatbuffer_tensor.type(),
+                                          &result->type,
+                                          tflite::GetMicroErrorReporter()));
 
   result->data.data = GetFlatbufferTensorBuffer(flatbuffer_tensor, buffers);
 
@@ -335,12 +341,18 @@ TfLiteStatus InitializeTfLiteEvalTensorFromFlatbuffer(
 }  // namespace internal
 
 size_t MicroAllocator::GetDefaultTailUsage(bool is_memory_planner_given) {
-  size_t total_size = AlignSizeUp<SingleArenaBufferAllocator>() +
-                      AlignSizeUp<MicroAllocator>() +
-                      AlignSizeUp<MicroBuiltinDataAllocator>() +
-                      AlignSizeUp<SubgraphAllocations>();
+  // TODO(b/208703041): a template version of AlignSizeUp to make expression
+  // shorter.
+  size_t total_size =
+      AlignSizeUp(sizeof(SingleArenaBufferAllocator),
+                  alignof(SingleArenaBufferAllocator)) +
+      AlignSizeUp(sizeof(MicroAllocator), alignof(MicroAllocator)) +
+      AlignSizeUp(sizeof(MicroBuiltinDataAllocator),
+                  alignof(MicroBuiltinDataAllocator)) +
+      AlignSizeUp(sizeof(SubgraphAllocations), alignof(SubgraphAllocations));
   if (!is_memory_planner_given) {
-    total_size += AlignSizeUp<GreedyMemoryPlanner>();
+    total_size +=
+        AlignSizeUp(sizeof(GreedyMemoryPlanner), alignof(GreedyMemoryPlanner));
   }
   return total_size;
 }
@@ -489,6 +501,15 @@ TfLiteStatus MicroAllocator::FinishModelAllocation(
   // Allocate scratch buffer metadata.
   TF_LITE_ENSURE_STATUS(AllocateScratchBufferHandles(
       scratch_buffer_handles, scratch_buffer_request_count_));
+
+  // Allocate buffers for variable tensors.
+  for (size_t subgraph_idx = 0; subgraph_idx < model->subgraphs()->size();
+       subgraph_idx++) {
+    const SubGraph* subgraph = model->subgraphs()->Get(subgraph_idx);
+    TFLITE_DCHECK(subgraph != nullptr);
+    TF_LITE_ENSURE_STATUS(AllocateVariables(
+        subgraph, subgraph_allocations[subgraph_idx].tensors));
+  }
 
   // Plan all subgraphs and scratch buffers together.
   TF_LITE_ENSURE_STATUS(CommitStaticMemoryPlan(model, subgraph_allocations,
@@ -703,14 +724,6 @@ TfLiteTensor* MicroAllocator::AllocateTempTfLiteTensor(
   return tensor;
 }
 
-uint8_t* MicroAllocator::AllocateTempBuffer(size_t size, size_t alignment) {
-  return non_persistent_buffer_allocator_->AllocateTemp(size, alignment);
-}
-
-void MicroAllocator::DeallocateTempBuffer(uint8_t* buffer) {
-  non_persistent_buffer_allocator_->DeallocateTemp(buffer);
-}
-
 TfLiteStatus MicroAllocator::ResetTempAllocations() {
   return non_persistent_buffer_allocator_->ResetTempAllocations();
 }
@@ -753,27 +766,23 @@ TfLiteStatus MicroAllocator::AllocateTfLiteEvalTensors(
   return kTfLiteOk;
 }
 
-TfLiteStatus MicroAllocator::AllocateVariables(
-    const SubGraph* subgraph, TfLiteEvalTensor* eval_tensors,
-    const int32_t* offline_planner_offsets) {
+TfLiteStatus MicroAllocator::AllocateVariables(const SubGraph* subgraph,
+                                               TfLiteEvalTensor* eval_tensors) {
   for (size_t i = 0; i < subgraph->tensors()->size(); ++i) {
     auto* tensor = subgraph->tensors()->Get(i);
     if (tensor->is_variable()) {
-      if (offline_planner_offsets == nullptr ||
-          offline_planner_offsets[i] == kOnlinePlannedBuffer) {
-        size_t buffer_size;
-        TF_LITE_ENSURE_STATUS(
-            TfLiteEvalTensorByteLength(&eval_tensors[i], &buffer_size));
+      size_t buffer_size;
+      TF_LITE_ENSURE_STATUS(
+          TfLiteEvalTensorByteLength(&eval_tensors[i], &buffer_size));
 
-        eval_tensors[i].data.data =
-            persistent_buffer_allocator_->AllocatePersistentBuffer(
-                buffer_size, MicroArenaBufferAlignment());
+      eval_tensors[i].data.data =
+          persistent_buffer_allocator_->AllocatePersistentBuffer(
+              buffer_size, MicroArenaBufferAlignment());
 
-        if (eval_tensors[i].data.data == nullptr) {
-          MicroPrintf("Failed to allocate variable tensor of size %d",
-                      buffer_size);
-          return kTfLiteError;
-        }
+      if (eval_tensors[i].data.data == nullptr) {
+        MicroPrintf("Failed to allocate variable tensor of size %d",
+                    buffer_size);
+        return kTfLiteError;
       }
     }
   }
@@ -822,17 +831,6 @@ TfLiteStatus MicroAllocator::CommitStaticMemoryPlan(
   const int32_t* offline_planner_offsets = nullptr;
   TF_LITE_ENSURE_STATUS(
       builder.GetOfflinePlannedOffsets(&offline_planner_offsets));
-
-  // We allocate buffers for variable tensors here since the offline planner
-  // offsets are conviently available here.
-  for (size_t subgraph_idx = 0; subgraph_idx < model->subgraphs()->size();
-       subgraph_idx++) {
-    const SubGraph* subgraph = model->subgraphs()->Get(subgraph_idx);
-    TFLITE_DCHECK(subgraph != nullptr);
-    TF_LITE_ENSURE_STATUS(AllocateVariables(
-        subgraph, allocations[subgraph_idx].tensors, offline_planner_offsets));
-  }
-
   TF_LITE_ENSURE_STATUS(
       builder.InitializeAllocationInfo(offline_planner_offsets, allocations));
 
@@ -849,11 +847,7 @@ TfLiteStatus MicroAllocator::CommitStaticMemoryPlan(
           MicroArenaBufferAlignment());
   uint8_t* planner_arena = non_persistent_buffer_allocator_->AllocateTemp(
       remaining_arena_size, MicroArenaBufferAlignment());
-
-  if (planner_arena == nullptr) {
-    return kTfLiteError;
-  }
-
+  TF_LITE_ENSURE(tflite::GetMicroErrorReporter(), planner_arena != nullptr);
   memory_planner_->Init(planner_arena, remaining_arena_size);
   TF_LITE_ENSURE_STATUS(
       CreatePlan(memory_planner_, allocation_info, allocation_info_count));
@@ -939,7 +933,7 @@ internal::ScratchBufferRequest* MicroAllocator::GetScratchBufferRequests() {
       scratch_buffer_head_, alignof(internal::ScratchBufferRequest)));
 }
 
-TfLiteBridgeBuiltinDataAllocator* MicroAllocator::GetBuiltinDataAllocator() {
+BuiltinDataAllocator* MicroAllocator::GetBuiltinDataAllocator() {
   return builtin_data_allocator_;
 }
 

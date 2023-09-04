@@ -1,4 +1,4 @@
-/* Copyright 2023 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,11 +68,6 @@ TfLiteStatus ReshapeOutput(TfLiteContext* context, TfLiteNode* node) {
     }
   }
   if (stretch_dim != -1) {
-    TfLiteEvalTensor* output_eval =
-        tflite::micro::GetEvalOutput(context, node, kOutputTensor);
-    TF_LITE_ENSURE_STATUS(tflite::micro::CreateWritableTensorDimsWithCopy(
-        context, output, output_eval));
-    output_shape = output->dims;  // output tensor dims were moved
     output_shape->data[stretch_dim] = num_input_elements / num_output_elements;
     num_output_elements *= output_shape->data[stretch_dim];
   }
@@ -114,7 +109,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 
 }  // namespace reshape
 
-TfLiteRegistration_V1 Register_RESHAPE() {
+TfLiteRegistration Register_RESHAPE() {
   return tflite::micro::RegisterOp(nullptr, reshape::Prepare, reshape::Eval);
 }
 

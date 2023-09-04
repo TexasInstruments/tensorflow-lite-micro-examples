@@ -19,9 +19,19 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/error_reporter.h"
-#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+
+// Opaque type similar to TfLiteDelegate / TfLiteOpaqueDelegate.
+// This is used for cases (e.g. when using "TF Lite with Google Play Services")
+// where the TF Lite runtime might be built using a newer (or older)
+// version of the TF Lite sources than the app, and hence might have a
+// different definition of the TfLiteDelegate type. TF Lite APIs use
+// TfLiteOpaqueDelegate rather than TfLiteDelegate when they want to
+// refer to a delegate defined with that potentially different version
+// of the TfLiteDelegate type.
+struct TfLiteOpaqueDelegateStruct;
 
 namespace tflite {
 
@@ -52,7 +62,7 @@ class OpResolver {
   // Represents a function that creates a TfLite delegate instance.
   using TfLiteDelegateCreator =
       std::function<std::unique_ptr<TfLiteDelegate, void (*)(TfLiteDelegate*)>(
-          TfLiteContext* /*context*/)>;
+          int /*num_threads*/)>;
 
   // Represents a sequence of delegate creator functions.
   using TfLiteDelegateCreators = std::vector<TfLiteDelegateCreator>;
@@ -72,7 +82,8 @@ class OpResolver {
   // Represents an opaque delegate instance.
   // WARNING: Experimental interface, subject to change.
   using TfLiteOpaqueDelegatePtr =
-      std::unique_ptr<TfLiteOpaqueDelegate, void (*)(TfLiteOpaqueDelegate*)>;
+      std::unique_ptr<TfLiteOpaqueDelegateStruct,
+                      void (*)(TfLiteOpaqueDelegateStruct*)>;
 
   // Represents a function that creates an opaque delegate instance.
   // WARNING: Experimental interface, subject to change.

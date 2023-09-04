@@ -168,7 +168,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 
 }  // namespace
 
-TfLiteRegistration_V1 Register_CUMSUM() {
+TfLiteRegistration Register_CUMSUM() {
   return tflite::micro::RegisterOp(nullptr, Prepare, Eval);
 }
 

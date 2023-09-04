@@ -1,4 +1,4 @@
-/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
 
 namespace tflite {
-
-namespace {
+namespace ops {
+namespace micro {
+namespace floor {
 
 constexpr int kInputTensor = 0;
 constexpr int kOutputTensor = 0;
@@ -38,11 +39,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
                        tflite::micro::GetTensorData<float>(output));
   return kTfLiteOk;
 }
+}  // namespace floor
 
-}  // namespace
-
-TfLiteRegistration_V1 Register_FLOOR() {
-  return tflite::micro::RegisterOp(nullptr, nullptr, Eval);
+TfLiteRegistration Register_FLOOR() {
+  return tflite::micro::RegisterOp(nullptr, nullptr, floor::Eval);
 }
 
+}  // namespace micro
+}  // namespace ops
 }  // namespace tflite

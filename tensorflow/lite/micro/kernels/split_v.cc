@@ -1,4 +1,4 @@
-/* Copyright 2023 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2018 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
-
-namespace {
+namespace ops {
+namespace micro {
+namespace split_v {
 
 template <typename T>
 TfLiteStatus SplitImpl(TfLiteContext* context, TfLiteNode* node,
@@ -118,10 +119,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   return kTfLiteOk;
 }
 
-}  // namespace
+}  // namespace split_v
 
-TfLiteRegistration_V1 Register_SPLIT_V() {
-  return tflite::micro::RegisterOp(nullptr, Prepare, Eval);
+TfLiteRegistration Register_SPLIT_V() {
+  return tflite::micro::RegisterOp(nullptr, split_v::Prepare, split_v::Eval);
 }
 
+}  // namespace micro
+}  // namespace ops
 }  // namespace tflite

@@ -42,19 +42,17 @@ size_t EvalTensorBytes(const TfLiteEvalTensor* tensor) {
   return ElementCount(*tensor->dims) * bytes_per_element;
 }
 
-void SignedSymmetricPerChannelQuantize(
-    const float* values, TfLiteIntArray* dims, int quantized_dimension,
-    int8_t* quantized_values, float* scaling_factors, TfLiteType type) {
+void SignedSymmetricPerChannelQuantize(const float* values,
+                                       TfLiteIntArray* dims,
+                                       int quantized_dimension,
+                                       int8_t* quantized_values,
+                                       float* scaling_factors) {
   int input_size = ElementCount(*dims);
   int channel_count = dims->data[quantized_dimension];
   int per_channel_size = input_size / channel_count;
 
   int stride;
   int channel_stride;
-
-  int qmin = QMinFromTfLiteType(type);
-  int qmax = QMaxFromTfLiteType(type);
-
   if (quantized_dimension == 0) {
     stride = 1;
     channel_stride = per_channel_size;
@@ -76,13 +74,16 @@ void SignedSymmetricPerChannelQuantize(
       min = fminf(min, values[idx]);
       max = fmaxf(max, values[idx]);
     }
-    scaling_factors[channel] = fmaxf(fabs(min), fabs(max)) / qmax;
+    scaling_factors[channel] =
+        fmaxf(fabs(min), fabs(max)) / std::numeric_limits<int8_t>::max();
     for (int i = 0; i < per_channel_size; i++) {
       int idx = channel * channel_stride + i * stride;
       const int32_t quantized_value =
           static_cast<int32_t>(roundf(values[idx] / scaling_factors[channel]));
       // Clamp: just in case some odd numeric offset.
-      quantized_values[idx] = fminf(qmax, fmaxf(qmin + 1, quantized_value));
+      quantized_values[idx] =
+          fminf(std::numeric_limits<int8_t>::max(),
+                fmaxf(std::numeric_limits<int8_t>::min() + 1, quantized_value));
     }
   }
 }
