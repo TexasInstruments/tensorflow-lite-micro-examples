@@ -32,7 +32,7 @@ jobs:
 
       - name: Sync the code
         run: |
-          pip3 install Pillow Wave
+          pip3 install Pillow Wave numpy
           ./scripts/sync_from_tflite_micro.sh
           git config --local user.name "TI-AviBerko"
           git config --local user.email "avi@ti.com"
