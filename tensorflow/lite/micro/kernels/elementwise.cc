@@ -354,10 +354,6 @@ TfLiteStatus RsqrtEval(TfLiteContext* context, TfLiteNode* node) {
       return EvalImplQuantized<int8_t>(context, node,
                                        elementwise::RsqrtEvalQuantized,
                                        elementwise::validate_input_func, type);
-    case kTfLiteInt16:
-      return EvalImplQuantized<int16_t>(context, node,
-                                        elementwise::RsqrtEvalQuantized,
-                                        elementwise::validate_input_func, type);
 
     default:
       MicroPrintf("Current data type %s is not supported.",
@@ -377,7 +373,7 @@ TfLiteStatus LogicalNotEval(TfLiteContext* context, TfLiteNode* node) {
 }  // namespace
 }  // namespace elementwise
 
-TfLiteRegistration_V1 Register_ABS() {
+TfLiteRegistration Register_ABS() {
   return tflite::micro::RegisterOp(
       elementwise::ElementWiseAbsRsqrtInit,
       elementwise::PrepareAbsRsqrt<elementwise::IsAbsSupportedType,
@@ -385,31 +381,31 @@ TfLiteRegistration_V1 Register_ABS() {
       elementwise::AbsEval);
 }
 
-TfLiteRegistration_V1 Register_SIN() {
+TfLiteRegistration Register_SIN() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsNumericSupportedType>,
       elementwise::SinEval);
 }
 
-TfLiteRegistration_V1 Register_COS() {
+TfLiteRegistration Register_COS() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsNumericSupportedType>,
       elementwise::CosEval);
 }
 
-TfLiteRegistration_V1 Register_LOG() {
+TfLiteRegistration Register_LOG() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsNumericSupportedType>,
       elementwise::LogEval);
 }
 
-TfLiteRegistration_V1 Register_SQRT() {
+TfLiteRegistration Register_SQRT() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsNumericSupportedType>,
       elementwise::SqrtEval);
 }
 
-TfLiteRegistration_V1 Register_RSQRT() {
+TfLiteRegistration Register_RSQRT() {
   return tflite::micro::RegisterOp(
       elementwise::ElementWiseAbsRsqrtInit,
       elementwise::PrepareAbsRsqrt<elementwise::IsRsqrtSupportedType,
@@ -417,13 +413,13 @@ TfLiteRegistration_V1 Register_RSQRT() {
       elementwise::RsqrtEval);
 }
 
-TfLiteRegistration_V1 Register_SQUARE() {
+TfLiteRegistration Register_SQUARE() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsNumericSupportedType>,
       elementwise::SquareEval);
 }
 
-TfLiteRegistration_V1 Register_LOGICAL_NOT() {
+TfLiteRegistration Register_LOGICAL_NOT() {
   return tflite::micro::RegisterOp(
       nullptr, elementwise::GenericPrepare<elementwise::IsLogicalSupportedType>,
       elementwise::LogicalNotEval);

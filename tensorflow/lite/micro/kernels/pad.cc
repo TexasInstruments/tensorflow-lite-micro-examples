@@ -26,6 +26,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
+namespace ops {
+namespace micro {
+namespace pad {
 namespace {
 
 struct OpData {
@@ -33,95 +36,14 @@ struct OpData {
   int32_t output_zero_point;
 };
 
+}  // namespace
+
 void* Init(TfLiteContext* context, const char* buffer, size_t length) {
   TFLITE_DCHECK(context->AllocatePersistentBuffer != nullptr);
   return context->AllocatePersistentBuffer(context, sizeof(OpData));
 }
 
-TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
-  TFLITE_DCHECK(node->user_data != nullptr);
-  const OpData* data = static_cast<const OpData*>(node->user_data);
-
-  const TfLiteEvalTensor* input =
-      tflite::micro::GetEvalInput(context, node, /*index=*/0);
-  const TfLiteEvalTensor* constant_values =
-      NumInputs(node) == 3
-          ? tflite::micro::GetEvalInput(context, node, /*index=*/2)
-          : nullptr;
-  TfLiteEvalTensor* output =
-      tflite::micro::GetEvalOutput(context, node, /*index=*/0);
-
-  switch (input->type) {
-    case kTfLiteFloat32: {
-      float pad_value =
-          constant_values == nullptr
-              ? 0.f
-              : *tflite::micro::GetTensorData<float>(constant_values);
-      if (data->params.resizing_category == ResizingCategory::kImageStyle) {
-        reference_ops::PadImageStyle(
-            data->params, tflite::micro::GetTensorShape(input),
-            tflite::micro::GetTensorData<float>(input), &pad_value,
-            tflite::micro::GetTensorShape(output),
-            tflite::micro::GetTensorData<float>(output));
-      } else {
-        reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
-                           tflite::micro::GetTensorData<float>(input),
-                           &pad_value, tflite::micro::GetTensorShape(output),
-                           tflite::micro::GetTensorData<float>(output));
-      }
-    } break;
-    case kTfLiteInt8: {
-      int8_t pad_value;
-      if (constant_values == nullptr) {
-        pad_value = static_cast<uint8_t>(data->output_zero_point);
-      } else {
-        pad_value = *tflite::micro::GetTensorData<int8_t>(constant_values);
-      }
-      if (data->params.resizing_category == ResizingCategory::kImageStyle) {
-        reference_ops::PadImageStyle(
-            data->params, tflite::micro::GetTensorShape(input),
-            tflite::micro::GetTensorData<int8_t>(input), &pad_value,
-            tflite::micro::GetTensorShape(output),
-            tflite::micro::GetTensorData<int8_t>(output));
-      } else {
-        reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
-                           tflite::micro::GetTensorData<int8_t>(input),
-                           &pad_value, tflite::micro::GetTensorShape(output),
-                           tflite::micro::GetTensorData<int8_t>(output));
-      }
-    } break;
-    case kTfLiteInt16: {
-      int16_t pad_value =
-          constant_values == nullptr
-              ? 0
-              : *tflite::micro::GetTensorData<int16_t>(constant_values);
-      reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
-                         tflite::micro::GetTensorData<int16_t>(input),
-                         &pad_value, tflite::micro::GetTensorShape(output),
-                         tflite::micro::GetTensorData<int16_t>(output));
-    } break;
-    case kTfLiteInt32: {
-      int32_t pad_value =
-          constant_values == nullptr
-              ? 0
-              : *tflite::micro::GetTensorData<int32_t>(constant_values);
-      reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
-                         tflite::micro::GetTensorData<int32_t>(input),
-                         &pad_value, tflite::micro::GetTensorShape(output),
-                         tflite::micro::GetTensorData<int32_t>(output));
-    } break;
-    default:
-
-      MicroPrintf("Type %s not currently supported by Pad.",
-                  TfLiteTypeGetName(input->type));
-      return kTfLiteError;
-  }
-  return kTfLiteOk;
-}
-
-}  // namespace
-
-TfLiteStatus PadPrepare(TfLiteContext* context, TfLiteNode* node) {
+TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
   MicroContext* micro_context = GetMicroContext(context);
 
   TFLITE_DCHECK(node->user_data != nullptr);
@@ -218,13 +140,98 @@ TfLiteStatus PadPrepare(TfLiteContext* context, TfLiteNode* node) {
   return kTfLiteOk;
 }
 
-TfLiteRegistration_V1 Register_PAD() {
-  return tflite::micro::RegisterOp(Init, PadPrepare, Eval);
+TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
+  TFLITE_DCHECK(node->user_data != nullptr);
+  const OpData* data = static_cast<const OpData*>(node->user_data);
+
+  const TfLiteEvalTensor* input =
+      tflite::micro::GetEvalInput(context, node, /*index=*/0);
+  const TfLiteEvalTensor* constant_values =
+      NumInputs(node) == 3
+          ? tflite::micro::GetEvalInput(context, node, /*index=*/2)
+          : nullptr;
+  TfLiteEvalTensor* output =
+      tflite::micro::GetEvalOutput(context, node, /*index=*/0);
+
+  switch (input->type) {
+    case kTfLiteFloat32: {
+      float pad_value =
+          constant_values == nullptr
+              ? 0.f
+              : *tflite::micro::GetTensorData<float>(constant_values);
+      if (data->params.resizing_category == ResizingCategory::kImageStyle) {
+        reference_ops::PadImageStyle(
+            data->params, tflite::micro::GetTensorShape(input),
+            tflite::micro::GetTensorData<float>(input), &pad_value,
+            tflite::micro::GetTensorShape(output),
+            tflite::micro::GetTensorData<float>(output));
+      } else {
+        reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
+                           tflite::micro::GetTensorData<float>(input),
+                           &pad_value, tflite::micro::GetTensorShape(output),
+                           tflite::micro::GetTensorData<float>(output));
+      }
+    } break;
+    case kTfLiteInt8: {
+      int8_t pad_value;
+      if (constant_values == nullptr) {
+        pad_value = static_cast<uint8_t>(data->output_zero_point);
+      } else {
+        pad_value = *tflite::micro::GetTensorData<int8_t>(constant_values);
+      }
+      if (data->params.resizing_category == ResizingCategory::kImageStyle) {
+        reference_ops::PadImageStyle(
+            data->params, tflite::micro::GetTensorShape(input),
+            tflite::micro::GetTensorData<int8_t>(input), &pad_value,
+            tflite::micro::GetTensorShape(output),
+            tflite::micro::GetTensorData<int8_t>(output));
+      } else {
+        reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
+                           tflite::micro::GetTensorData<int8_t>(input),
+                           &pad_value, tflite::micro::GetTensorShape(output),
+                           tflite::micro::GetTensorData<int8_t>(output));
+      }
+    } break;
+    case kTfLiteInt16: {
+      int16_t pad_value =
+          constant_values == nullptr
+              ? 0
+              : *tflite::micro::GetTensorData<int16_t>(constant_values);
+      reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
+                         tflite::micro::GetTensorData<int16_t>(input),
+                         &pad_value, tflite::micro::GetTensorShape(output),
+                         tflite::micro::GetTensorData<int16_t>(output));
+    } break;
+    case kTfLiteInt32: {
+      int32_t pad_value =
+          constant_values == nullptr
+              ? 0
+              : *tflite::micro::GetTensorData<int32_t>(constant_values);
+      reference_ops::Pad(data->params, tflite::micro::GetTensorShape(input),
+                         tflite::micro::GetTensorData<int32_t>(input),
+                         &pad_value, tflite::micro::GetTensorShape(output),
+                         tflite::micro::GetTensorData<int32_t>(output));
+    } break;
+    default:
+
+      MicroPrintf("Type %s not currently supported by Pad.",
+                  TfLiteTypeGetName(input->type));
+      return kTfLiteError;
+  }
+  return kTfLiteOk;
+}
+
+}  // namespace pad
+
+TfLiteRegistration Register_PAD() {
+  return tflite::micro::RegisterOp(pad::Init, pad::Prepare, pad::Eval);
 }
 
 // Also register Pad as PadV2.
-TfLiteRegistration_V1 Register_PADV2() {
-  return tflite::micro::RegisterOp(Init, PadPrepare, Eval);
+TfLiteRegistration Register_PADV2() {
+  return tflite::micro::RegisterOp(pad::Init, pad::Prepare, pad::Eval);
 }
 
+}  // namespace micro
+}  // namespace ops
 }  // namespace tflite

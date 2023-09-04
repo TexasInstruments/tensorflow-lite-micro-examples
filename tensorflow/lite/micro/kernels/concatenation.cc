@@ -1,4 +1,4 @@
-/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
-
-namespace {
+namespace ops {
+namespace micro {
+namespace concatenation {
 
 constexpr int kMaxInputNum = 10;  // Maximum number of input tensors
 constexpr int kOutputTensor = 0;
@@ -250,10 +251,13 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   return kTfLiteOk;
 }
 
-}  // namespace
+}  // namespace concatenation
 
-TfLiteRegistration_V1 Register_CONCATENATION() {
-  return tflite::micro::RegisterOp(Init, Prepare, Eval);
+TfLiteRegistration Register_CONCATENATION() {
+  return tflite::micro::RegisterOp(concatenation::Init, concatenation::Prepare,
+                                   concatenation::Eval);
 }
 
+}  // namespace micro
+}  // namespace ops
 }  // namespace tflite

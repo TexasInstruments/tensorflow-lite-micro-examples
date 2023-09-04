@@ -1,4 +1,4 @@
-/* Copyright 2023 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
-
+namespace ops {
+namespace micro {
+namespace comparisons {
 namespace {
 
 struct OpData {
@@ -528,6 +530,8 @@ TfLiteStatus LessEqualEval(TfLiteContext* context, TfLiteNode* node) {
   return kTfLiteOk;
 }
 
+}  // namespace
+
 void* Init(TfLiteContext* context, const char* buffer, size_t length) {
   TFLITE_DCHECK(context->AllocatePersistentBuffer != nullptr);
   return context->AllocatePersistentBuffer(context, sizeof(OpData));
@@ -577,30 +581,38 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
   return kTfLiteOk;
 }
 
-}  // namespace
+}  // namespace comparisons
 
-TfLiteRegistration_V1 Register_EQUAL() {
-  return tflite::micro::RegisterOp(Init, Prepare, EqualEval);
+TfLiteRegistration Register_EQUAL() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::EqualEval);
 }
 
-TfLiteRegistration_V1 Register_NOT_EQUAL() {
-  return tflite::micro::RegisterOp(Init, Prepare, NotEqualEval);
+TfLiteRegistration Register_NOT_EQUAL() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::NotEqualEval);
 }
 
-TfLiteRegistration_V1 Register_GREATER() {
-  return tflite::micro::RegisterOp(Init, Prepare, GreaterEval);
+TfLiteRegistration Register_GREATER() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::GreaterEval);
 }
 
-TfLiteRegistration_V1 Register_GREATER_EQUAL() {
-  return tflite::micro::RegisterOp(Init, Prepare, GreaterEqualEval);
+TfLiteRegistration Register_GREATER_EQUAL() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::GreaterEqualEval);
 }
 
-TfLiteRegistration_V1 Register_LESS() {
-  return tflite::micro::RegisterOp(Init, Prepare, LessEval);
+TfLiteRegistration Register_LESS() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::LessEval);
 }
 
-TfLiteRegistration_V1 Register_LESS_EQUAL() {
-  return tflite::micro::RegisterOp(Init, Prepare, LessEqualEval);
+TfLiteRegistration Register_LESS_EQUAL() {
+  return tflite::micro::RegisterOp(comparisons::Init, comparisons::Prepare,
+                                   comparisons::LessEqualEval);
 }
 
+}  // namespace micro
+}  // namespace ops
 }  // namespace tflite

@@ -48,11 +48,11 @@ TfLiteStatus CalculateOpDataMul(TfLiteContext* context, TfLiteNode* node,
 
 TfLiteStatus MulPrepare(TfLiteContext* context, TfLiteNode* node);
 
-TfLiteStatus EvalMulQuantizedReference(TfLiteContext* context, TfLiteNode* node,
-                                       const OpDataMul* data,
-                                       const TfLiteEvalTensor* input1,
-                                       const TfLiteEvalTensor* input2,
-                                       TfLiteEvalTensor* output);
+void EvalMulQuantizedReference(TfLiteContext* context, TfLiteNode* node,
+                               const OpDataMul* data,
+                               const TfLiteEvalTensor* input1,
+                               const TfLiteEvalTensor* input2,
+                               TfLiteEvalTensor* output);
 
 void EvalMulFloatReference(TfLiteContext* context, TfLiteNode* node,
                            TfLiteMulParams* params, const OpDataMul* data,
@@ -61,13 +61,13 @@ void EvalMulFloatReference(TfLiteContext* context, TfLiteNode* node,
                            TfLiteEvalTensor* output);
 
 // Generic must define registration function.
-TfLiteRegistration_V1 Register_MUL();
+TfLiteRegistration Register_MUL();
 
 #if defined(CMSIS_NN)
-TfLiteRegistration_V1 Register_MUL_INT8();
+TfLiteRegistration Register_MUL_INT8();
 #else
 // Fallback registration
-inline TfLiteRegistration_V1 Register_MUL_INT8() { return Register_MUL(); }
+inline TfLiteRegistration Register_MUL_INT8() { return Register_MUL(); }
 #endif
 }  // namespace tflite
 

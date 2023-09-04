@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/kernels/softmax.h"
 
-#include "Include/arm_nnfunctions.h"
+#include "CMSIS/NN/Include/arm_nnfunctions.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/quantization_util.h"
@@ -190,19 +190,19 @@ TfLiteStatus SoftmaxEvalInt16(TfLiteContext* context, TfLiteNode* node) {
 
 }  // namespace
 
-TfLiteRegistration_V1 Register_SOFTMAX() {
+TfLiteRegistration Register_SOFTMAX() {
   return tflite::micro::RegisterOp(Init, Prepare, SoftmaxEval);
 }
 
-TfLiteRegistration_V1 Register_SOFTMAX_INT8() {
+TfLiteRegistration Register_SOFTMAX_INT8() {
   return tflite::micro::RegisterOp(Init, Prepare, SoftmaxEvalInt8);
 }
 
-TfLiteRegistration_V1 Register_SOFTMAX_INT8_INT16() {
+TfLiteRegistration Register_SOFTMAX_INT8_INT16() {
   return tflite::micro::RegisterOp(Init, Prepare, SoftmaxEvalInt8_Int16);
 }
 
-TfLiteRegistration_V1 Register_SOFTMAX_INT16() {
+TfLiteRegistration Register_SOFTMAX_INT16() {
   return tflite::micro::RegisterOp(Init, Prepare, SoftmaxEvalInt16);
 }
 

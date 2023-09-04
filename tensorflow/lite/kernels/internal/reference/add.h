@@ -194,10 +194,8 @@ inline void Add(const ArithmeticParams& params,
   }
 }
 
-template <typename T,
-          // For unquantized add for small integers, explictly set to true.
-          bool dummy = false>
-inline typename std::enable_if<!is_small_integer<T>::value || dummy, void>::type
+template <typename T>
+inline typename std::enable_if<!is_small_integer<T>::value, void>::type
 BroadcastAdd4DSlow(const ArithmeticParams& params,
                    const RuntimeShape& input1_shape, const T* input1_data,
                    const RuntimeShape& input2_shape, const T* input2_data,
