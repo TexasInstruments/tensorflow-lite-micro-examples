@@ -40,7 +40,7 @@ class MicroProfiler : public MicroProfilerInterface {
   // only once per event_handle.
   //
   // If EndEvent is called more than once for the same event_handle, the last
-  // call will be used as the end of event marker.If EndEvent is called 0 times
+  // call will be used as the end of event marker. If EndEvent is called 0 times
   // for a particular event_handle, the duration of that event will be 0 ticks.
   virtual void EndEvent(uint32_t event_handle) override;
 
@@ -66,10 +66,10 @@ class MicroProfiler : public MicroProfilerInterface {
   void LogTicksPerTagCsv();
 
  private:
-  // Maximum number of events that this class can keep track of. If we call
-  // AddEvent more than kMaxEvents number of times, then the oldest event's
-  // profiling information will be overwritten.
-  static constexpr int kMaxEvents = 1024;
+  // Maximum number of events that this class can keep track of. The
+  // MicroProfiler will abort if AddEvent is called more than kMaxEvents number
+  // of times. Increase this number if you need more events.
+  static constexpr int kMaxEvents = 4096;
 
   const char* tags_[kMaxEvents];
   uint32_t start_ticks_[kMaxEvents];
@@ -87,7 +87,7 @@ class MicroProfiler : public MicroProfilerInterface {
 
   int FindExistingOrNextPosition(const char* tag_name);
 
-  TF_LITE_REMOVE_VIRTUAL_DELETE;
+  TF_LITE_REMOVE_VIRTUAL_DELETE
 };
 
 #if defined(TF_LITE_STRIP_ERROR_STRINGS)
@@ -97,7 +97,8 @@ class MicroProfiler : public MicroProfilerInterface {
 // MicroInterpreter and we want to ensure zero overhead for the release builds.
 class ScopedMicroProfiler {
  public:
-  explicit ScopedMicroProfiler(const char* tag, MicroProfiler* profiler) {}
+  explicit ScopedMicroProfiler(const char* tag,
+                               MicroProfilerInterface* profiler) {}
 };
 
 #else
@@ -114,7 +115,8 @@ class ScopedMicroProfiler {
 // }
 class ScopedMicroProfiler {
  public:
-  explicit ScopedMicroProfiler(const char* tag, MicroProfiler* profiler)
+  explicit ScopedMicroProfiler(const char* tag,
+                               MicroProfilerInterface* profiler)
       : profiler_(profiler) {
     if (profiler_ != nullptr) {
       event_handle_ = profiler_->BeginEvent(tag);
@@ -129,7 +131,7 @@ class ScopedMicroProfiler {
 
  private:
   uint32_t event_handle_ = 0;
-  MicroProfiler* profiler_ = nullptr;
+  MicroProfilerInterface* profiler_ = nullptr;
 };
 #endif  // !defined(TF_LITE_STRIP_ERROR_STRINGS)
 

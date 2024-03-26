@@ -1,11 +1,11 @@
 /**************************************************************************//**
  * @file     core_armv8mml.h
  * @brief    CMSIS Armv8-M Mainline Core Peripheral Access Layer Header File
- * @version  V5.2.3
- * @date     13. October 2021
+ * @version  V5.3.0
+ * @date     04. April 2023
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2023 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -116,6 +116,29 @@
     #else
       #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
       #define __DSP_USED         0U
+    #endif
+  #else
+    #define __DSP_USED         0U
+  #endif
+
+#elif defined (__ti__)
+  #if defined (__ARM_FP)
+    #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
+      #define __FPU_USED       1U
+    #else
+      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+      #define __FPU_USED       0U
+    #endif
+  #else
+    #define __FPU_USED         0U
+  #endif
+
+  #if defined (__ARM_FEATURE_DSP) && (__ARM_FEATURE_DSP == 1U)
+    #if defined (__DSP_PRESENT) && (__DSP_PRESENT == 1U)
+      #define __DSP_USED       1U
+    #else
+      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+      #define __DSP_USED       0U
     #endif
   #else
     #define __DSP_USED         0U
@@ -287,7 +310,7 @@
 #define     __OM     volatile            /*! Defines 'write only' structure member permissions */
 #define     __IOM    volatile            /*! Defines 'read / write' structure member permissions */
 
-/*@} end of group ARMv8MML */
+/** @} end of group ARMv8MML */
 
 
 
@@ -452,7 +475,7 @@ typedef union
 #define CONTROL_nPRIV_Pos                   0U                                            /*!< CONTROL: nPRIV Position */
 #define CONTROL_nPRIV_Msk                  (1UL /*<< CONTROL_nPRIV_Pos*/)                 /*!< CONTROL: nPRIV Mask */
 
-/*@} end of group CMSIS_CORE */
+/** @} end of group CMSIS_CORE */
 
 
 /**
@@ -488,7 +511,7 @@ typedef struct
 #define NVIC_STIR_INTID_Pos                 0U                                         /*!< STIR: INTLINESNUM Position */
 #define NVIC_STIR_INTID_Msk                (0x1FFUL /*<< NVIC_STIR_INTID_Pos*/)        /*!< STIR: INTLINESNUM Mask */
 
-/*@} end of group CMSIS_NVIC */
+/** @} end of group CMSIS_NVIC */
 
 
 /**
@@ -924,7 +947,7 @@ typedef struct
 #define SCB_DCCISW_SET_Pos                  5U                                            /*!< SCB DCCISW: Set Position */
 #define SCB_DCCISW_SET_Msk                 (0x1FFUL << SCB_DCCISW_SET_Pos)                /*!< SCB DCCISW: Set Mask */
 
-/*@} end of group CMSIS_SCB */
+/** @} end of group CMSIS_SCB */
 
 
 /**
@@ -949,7 +972,7 @@ typedef struct
 #define SCnSCB_ICTR_INTLINESNUM_Pos         0U                                         /*!< ICTR: INTLINESNUM Position */
 #define SCnSCB_ICTR_INTLINESNUM_Msk        (0xFUL /*<< SCnSCB_ICTR_INTLINESNUM_Pos*/)  /*!< ICTR: INTLINESNUM Mask */
 
-/*@} end of group CMSIS_SCnotSCB */
+/** @} end of group CMSIS_SCnotSCB */
 
 
 /**
@@ -1001,7 +1024,7 @@ typedef struct
 #define SysTick_CALIB_TENMS_Pos             0U                                            /*!< SysTick CALIB: TENMS Position */
 #define SysTick_CALIB_TENMS_Msk            (0xFFFFFFUL /*<< SysTick_CALIB_TENMS_Pos*/)    /*!< SysTick CALIB: TENMS Mask */
 
-/*@} end of group CMSIS_SysTick */
+/** @} end of group CMSIS_SysTick */
 
 
 /**
@@ -1101,7 +1124,7 @@ typedef struct
 #define ITM_LSR_Present_Pos                 0U                                            /*!< ITM LSR: Present Position */
 #define ITM_LSR_Present_Msk                (1UL /*<< ITM_LSR_Present_Pos*/)               /*!< ITM LSR: Present Mask */
 
-/*@}*/ /* end of group CMSIS_ITM */
+/** @}*/ /* end of group CMSIS_ITM */
 
 
 /**
@@ -1287,7 +1310,7 @@ typedef struct
 #define DWT_FUNCTION_MATCH_Pos              0U                                         /*!< DWT FUNCTION: MATCH Position */
 #define DWT_FUNCTION_MATCH_Msk             (0xFUL /*<< DWT_FUNCTION_MATCH_Pos*/)       /*!< DWT FUNCTION: MATCH Mask */
 
-/*@}*/ /* end of group CMSIS_DWT */
+/** @}*/ /* end of group CMSIS_DWT */
 
 
 /**
@@ -1385,7 +1408,7 @@ typedef struct
 #define TPI_DEVTYPE_MajorType_Pos           0U                                         /*!< TPI DEVTYPE: MajorType Position */
 #define TPI_DEVTYPE_MajorType_Msk          (0xFUL << TPI_DEVTYPE_MajorType_Pos)        /*!< TPI DEVTYPE: MajorType Mask */
 
-/*@}*/ /* end of group CMSIS_TPI */
+/** @}*/ /* end of group CMSIS_TPI */
 
 
 #if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U)
@@ -1497,7 +1520,7 @@ typedef struct
 #define MPU_MAIR1_Attr4_Pos                 0U                                            /*!< MPU MAIR1: Attr4 Position */
 #define MPU_MAIR1_Attr4_Msk                (0xFFUL /*<< MPU_MAIR1_Attr4_Pos*/)            /*!< MPU MAIR1: Attr4 Mask */
 
-/*@} end of group CMSIS_MPU */
+/** @} end of group CMSIS_MPU */
 #endif
 
 
@@ -1584,7 +1607,7 @@ typedef struct
 #define SAU_SFSR_INVEP_Pos                  0U                                            /*!< SAU SFSR: INVEP Position */
 #define SAU_SFSR_INVEP_Msk                 (1UL /*<< SAU_SFSR_INVEP_Pos*/)                /*!< SAU SFSR: INVEP Mask */
 
-/*@} end of group CMSIS_SAU */
+/** @} end of group CMSIS_SAU */
 #endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
 
 
@@ -1720,7 +1743,7 @@ typedef struct
 #define FPU_MVFR2_FPMisc_Pos                4U                                            /*!< MVFR2: FPMisc bits Position */
 #define FPU_MVFR2_FPMisc_Msk               (0xFUL << FPU_MVFR2_FPMisc_Pos)                /*!< MVFR2: FPMisc bits Mask */
 
-/*@} end of group CMSIS_FPU */
+/** @} end of group CMSIS_FPU */
 
 /* CoreDebug is deprecated. replaced by DCB (Debug Control Block) */
 /**
@@ -1854,7 +1877,7 @@ typedef struct
 #define CoreDebug_DSCSR_SBRSELEN_Pos        0U                                            /*!< \deprecated CoreDebug DSCSR: SBRSELEN Position */
 #define CoreDebug_DSCSR_SBRSELEN_Msk       (1UL /*<< CoreDebug_DSCSR_SBRSELEN_Pos*/)      /*!< \deprecated CoreDebug DSCSR: SBRSELEN Mask */
 
-/*@} end of group CMSIS_CoreDebug */
+/** @} end of group CMSIS_CoreDebug */
 
 
 /**
@@ -2010,7 +2033,7 @@ typedef struct
 #define DCB_DSCSR_SBRSELEN_Pos              0U                                            /*!< DCB DSCSR: Secure banked register select enable Position */
 #define DCB_DSCSR_SBRSELEN_Msk             (0x1UL /*<< DCB_DSCSR_SBRSELEN_Pos*/)          /*!< DCB DSCSR: Secure banked register select enable Mask */
 
-/*@} end of group CMSIS_DCB */
+/** @} end of group CMSIS_DCB */
 
 
 
@@ -2084,7 +2107,7 @@ typedef struct
 #define DIB_DDEVTYPE_MAJOR_Msk             (0xFUL /*<< DIB_DDEVTYPE_MAJOR_Pos*/)          /*!< DIB DDEVTYPE: Major type Mask */
 
 
-/*@} end of group CMSIS_DIB */
+/** @} end of group CMSIS_DIB */
 
 
 /**
@@ -2110,7 +2133,7 @@ typedef struct
 */
 #define _FLD2VAL(field, value)    (((uint32_t)(value) & field ## _Msk) >> field ## _Pos)
 
-/*@} end of group CMSIS_core_bitfield */
+/** @} end of group CMSIS_core_bitfield */
 
 
 /**
@@ -2182,7 +2205,7 @@ typedef struct
   #define FPU_NS              ((FPU_Type       *)     FPU_BASE_NS      ) /*!< Floating Point Unit               (non-secure address space) */
 
 #endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
-/*@} */
+/** @} */
 
 
 /**
@@ -2850,7 +2873,7 @@ __STATIC_INLINE uint32_t TZ_NVIC_GetPriority_NS(IRQn_Type IRQn)
 }
 #endif /*  defined (__ARM_FEATURE_CMSE) &&(__ARM_FEATURE_CMSE == 3U) */
 
-/*@} end of CMSIS_Core_NVICFunctions */
+/** @} end of CMSIS_Core_NVICFunctions */
 
 /* ##########################  MPU functions  #################################### */
 
@@ -2896,7 +2919,7 @@ __STATIC_INLINE uint32_t SCB_GetFPUType(void)
 }
 
 
-/*@} end of CMSIS_Core_FpuFunctions */
+/** @} end of CMSIS_Core_FpuFunctions */
 
 
 /* ##########################  Cache functions  #################################### */
@@ -2939,7 +2962,7 @@ __STATIC_INLINE void TZ_SAU_Disable(void)
 
 #endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
 
-/*@} end of CMSIS_Core_SAUFunctions */
+/** @} end of CMSIS_Core_SAUFunctions */
 
 
 
@@ -3006,7 +3029,7 @@ __STATIC_INLINE uint32_t TZ_DCB_GetAuthCtrl_NS(void)
 }
 #endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
 
-/*@} end of CMSIS_Core_DCBFunctions */
+/** @} end of CMSIS_Core_DCBFunctions */
 
 
 
@@ -3043,7 +3066,7 @@ __STATIC_INLINE uint32_t TZ_DIB_GetAuthStatus_NS(void)
 }
 #endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
 
-/*@} end of CMSIS_Core_DCBFunctions */
+/** @} end of CMSIS_Core_DCBFunctions */
 
 
 
@@ -3117,7 +3140,7 @@ __STATIC_INLINE uint32_t TZ_SysTick_Config_NS(uint32_t ticks)
 
 #endif
 
-/*@} end of CMSIS_Core_SysTickFunctions */
+/** @} end of CMSIS_Core_SysTickFunctions */
 
 
 
@@ -3195,7 +3218,7 @@ __STATIC_INLINE int32_t ITM_CheckChar (void)
   }
 }
 
-/*@} end of CMSIS_core_DebugFunctions */
+/** @} end of CMSIS_core_DebugFunctions */
 
 
 

@@ -1,11 +1,11 @@
 /**************************************************************************//**
  * @file     core_cm85.h
  * @brief    CMSIS Cortex-M85 Core Peripheral Access Layer Header File
- * @version  V1.0.4
- * @date     21. April 2022
+ * @version  V1.3.1
+ * @date     19. April 2023
  ******************************************************************************/
 /*
- * Copyright (c) 2022 Arm Limited. All rights reserved.
+ * Copyright (c) 2022-2023 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -84,6 +84,29 @@
 
   #if defined(__ARM_FEATURE_DSP)
     #if defined(__DSP_PRESENT) && (__DSP_PRESENT == 1U)
+      #define __DSP_USED       1U
+    #else
+      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+      #define __DSP_USED       0U
+    #endif
+  #else
+    #define __DSP_USED         0U
+  #endif
+
+#elif defined (__ti__)
+  #if defined (__ARM_FP)
+    #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
+      #define __FPU_USED       1U
+    #else
+      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+      #define __FPU_USED       0U
+    #endif
+  #else
+    #define __FPU_USED         0U
+  #endif
+
+  #if defined (__ARM_FEATURE_DSP) && (__ARM_FEATURE_DSP == 1U)
+    #if defined (__DSP_PRESENT) && (__DSP_PRESENT == 1U)
       #define __DSP_USED       1U
     #else
       #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
@@ -300,6 +323,7 @@
   - Core Register
   - Core NVIC Register
   - Core EWIC Register
+  - Core EWIC Interrupt Status Access Register
   - Core SCB Register
   - Core SysTick Register
   - Core Debug Register
@@ -1130,13 +1154,15 @@ typedef struct
   __IOM uint32_t TPR;                    /*!< Offset: 0xE40 (R/W)  ITM Trace Privilege Register */
         uint32_t RESERVED2[15U];
   __IOM uint32_t TCR;                    /*!< Offset: 0xE80 (R/W)  ITM Trace Control Register */
-        uint32_t RESERVED3[32U];
-        uint32_t RESERVED4[43U];
-  __OM  uint32_t LAR;                    /*!< Offset: 0xFB0 ( /W)  ITM Lock Access Register */
-  __IM  uint32_t LSR;                    /*!< Offset: 0xFB4 (R/ )  ITM Lock Status Register */
+        uint32_t RESERVED3[27U];
+  __IM  uint32_t ITREAD;                 /*!< Offset: 0xEF0 (R/ )  ITM Integration Read Register */
+        uint32_t RESERVED4[1U];
+  __OM  uint32_t ITWRITE;                /*!< Offset: 0xEF8 ( /W)  ITM Integration Write Register */
         uint32_t RESERVED5[1U];
+  __IOM uint32_t ITCTRL;                 /*!< Offset: 0xF00 (R/W)  ITM Integration Mode Control Register */
+        uint32_t RESERVED6[46U];
   __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  ITM Device Architecture Register */
-        uint32_t RESERVED6[3U];
+        uint32_t RESERVED7[3U];
   __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  ITM Device Type Register */
   __IM  uint32_t PID4;                   /*!< Offset: 0xFD0 (R/ )  ITM Peripheral Identification Register #4 */
   __IM  uint32_t PID5;                   /*!< Offset: 0xFD4 (R/ )  ITM Peripheral Identification Register #5 */
@@ -1194,15 +1220,23 @@ typedef struct
 #define ITM_TCR_ITMENA_Pos                  0U                                            /*!< ITM TCR: ITM Enable bit Position */
 #define ITM_TCR_ITMENA_Msk                 (1UL /*<< ITM_TCR_ITMENA_Pos*/)                /*!< ITM TCR: ITM Enable bit Mask */
 
-/* ITM Lock Status Register Definitions */
-#define ITM_LSR_ByteAcc_Pos                 2U                                            /*!< ITM LSR: ByteAcc Position */
-#define ITM_LSR_ByteAcc_Msk                (1UL << ITM_LSR_ByteAcc_Pos)                   /*!< ITM LSR: ByteAcc Mask */
+/* ITM Integration Read Register Definitions */
+#define ITM_ITREAD_AFVALID_Pos              1U                                            /*!< ITM ITREAD: AFVALID Position */
+#define ITM_ITREAD_AFVALID_Msk             (0x1UL << ITM_ITREAD_AFVALID_Pos)              /*!< ITM ITREAD: AFVALID Mask */
 
-#define ITM_LSR_Access_Pos                  1U                                            /*!< ITM LSR: Access Position */
-#define ITM_LSR_Access_Msk                 (1UL << ITM_LSR_Access_Pos)                    /*!< ITM LSR: Access Mask */
+#define ITM_ITREAD_ATREADY_Pos              0U                                            /*!< ITM ITREAD: ATREADY Position */
+#define ITM_ITREAD_ATREADY_Msk             (0x1UL /*<< ITM_ITREAD_ATREADY_Pos*/)          /*!< ITM ITREAD: ATREADY Mask */
 
-#define ITM_LSR_Present_Pos                 0U                                            /*!< ITM LSR: Present Position */
-#define ITM_LSR_Present_Msk                (1UL /*<< ITM_LSR_Present_Pos*/)               /*!< ITM LSR: Present Mask */
+/* ITM Integration Write Register Definitions */
+#define ITM_ITWRITE_AFVALID_Pos             1U                                            /*!< ITM ITWRITE: AFVALID Position */
+#define ITM_ITWRITE_AFVALID_Msk            (0x1UL << ITM_ITWRITE_AFVALID_Pos)             /*!< ITM ITWRITE: AFVALID Mask */
+
+#define ITM_ITWRITE_ATREADY_Pos             0U                                            /*!< ITM ITWRITE: ATREADY Position */
+#define ITM_ITWRITE_ATREADY_Msk            (0x1UL /*<< ITM_ITWRITE_ATREADY_Pos*/)         /*!< ITM ITWRITE: ATREADY Mask */
+
+/* ITM Integration Mode Control Register Definitions */
+#define ITM_ITCTRL_IME_Pos                  0U                                            /*!< ITM ITCTRL: IME Position */
+#define ITM_ITCTRL_IME_Msk                 (0x1UL /*<< ITM_ITCTRL_IME_Pos*/)              /*!< ITM ITCTRL: IME Mask */
 
 /*@}*/ /* end of group CMSIS_ITM */
 
@@ -1234,66 +1268,34 @@ typedef struct
   __IOM uint32_t COMP1;                  /*!< Offset: 0x030 (R/W)  Comparator Register 1 */
         uint32_t RESERVED3[1U];
   __IOM uint32_t FUNCTION1;              /*!< Offset: 0x038 (R/W)  Function Register 1 */
-        uint32_t RESERVED4[1U];
+  __IOM uint32_t VMASK1;                 /*!< Offset: 0x03C (R/W)  Comparator Value Mask 1 */
   __IOM uint32_t COMP2;                  /*!< Offset: 0x040 (R/W)  Comparator Register 2 */
-        uint32_t RESERVED5[1U];
+        uint32_t RESERVED4[1U];
   __IOM uint32_t FUNCTION2;              /*!< Offset: 0x048 (R/W)  Function Register 2 */
-        uint32_t RESERVED6[1U];
+        uint32_t RESERVED5[1U];
   __IOM uint32_t COMP3;                  /*!< Offset: 0x050 (R/W)  Comparator Register 3 */
-        uint32_t RESERVED7[1U];
+        uint32_t RESERVED6[1U];
   __IOM uint32_t FUNCTION3;              /*!< Offset: 0x058 (R/W)  Function Register 3 */
-        uint32_t RESERVED8[1U];
+  __IOM uint32_t VMASK3;                 /*!< Offset: 0x05C (R/W)  Comparator Value Mask 3 */
   __IOM uint32_t COMP4;                  /*!< Offset: 0x060 (R/W)  Comparator Register 4 */
-        uint32_t RESERVED9[1U];
+        uint32_t RESERVED7[1U];
   __IOM uint32_t FUNCTION4;              /*!< Offset: 0x068 (R/W)  Function Register 4 */
-        uint32_t RESERVED10[1U];
+        uint32_t RESERVED8[1U];
   __IOM uint32_t COMP5;                  /*!< Offset: 0x070 (R/W)  Comparator Register 5 */
-        uint32_t RESERVED11[1U];
+        uint32_t RESERVED9[1U];
   __IOM uint32_t FUNCTION5;              /*!< Offset: 0x078 (R/W)  Function Register 5 */
-        uint32_t RESERVED12[1U];
+        uint32_t RESERVED10[1U];
   __IOM uint32_t COMP6;                  /*!< Offset: 0x080 (R/W)  Comparator Register 6 */
-        uint32_t RESERVED13[1U];
+        uint32_t RESERVED11[1U];
   __IOM uint32_t FUNCTION6;              /*!< Offset: 0x088 (R/W)  Function Register 6 */
-        uint32_t RESERVED14[1U];
+        uint32_t RESERVED12[1U];
   __IOM uint32_t COMP7;                  /*!< Offset: 0x090 (R/W)  Comparator Register 7 */
-        uint32_t RESERVED15[1U];
+        uint32_t RESERVED13[1U];
   __IOM uint32_t FUNCTION7;              /*!< Offset: 0x098 (R/W)  Function Register 7 */
-        uint32_t RESERVED16[1U];
-  __IOM uint32_t COMP8;                  /*!< Offset: 0x0A0 (R/W)  Comparator Register 8 */
-        uint32_t RESERVED17[1U];
-  __IOM uint32_t FUNCTION8;              /*!< Offset: 0x0A8 (R/W)  Function Register 8 */
-        uint32_t RESERVED18[1U];
-  __IOM uint32_t COMP9;                  /*!< Offset: 0x0B0 (R/W)  Comparator Register 9 */
-        uint32_t RESERVED19[1U];
-  __IOM uint32_t FUNCTION9;              /*!< Offset: 0x0B8 (R/W)  Function Register 9 */
-        uint32_t RESERVED20[1U];
-  __IOM uint32_t COMP10;                 /*!< Offset: 0x0C0 (R/W)  Comparator Register 10 */
-        uint32_t RESERVED21[1U];
-  __IOM uint32_t FUNCTION10;             /*!< Offset: 0x0C8 (R/W)  Function Register 10 */
-        uint32_t RESERVED22[1U];
-  __IOM uint32_t COMP11;                 /*!< Offset: 0x0D0 (R/W)  Comparator Register 11 */
-        uint32_t RESERVED23[1U];
-  __IOM uint32_t FUNCTION11;             /*!< Offset: 0x0D8 (R/W)  Function Register 11 */
-        uint32_t RESERVED24[1U];
-  __IOM uint32_t COMP12;                 /*!< Offset: 0x0E0 (R/W)  Comparator Register 12 */
-        uint32_t RESERVED25[1U];
-  __IOM uint32_t FUNCTION12;             /*!< Offset: 0x0E8 (R/W)  Function Register 12 */
-        uint32_t RESERVED26[1U];
-  __IOM uint32_t COMP13;                 /*!< Offset: 0x0F0 (R/W)  Comparator Register 13 */
-        uint32_t RESERVED27[1U];
-  __IOM uint32_t FUNCTION13;             /*!< Offset: 0x0F8 (R/W)  Function Register 13 */
-        uint32_t RESERVED28[1U];
-  __IOM uint32_t COMP14;                 /*!< Offset: 0x100 (R/W)  Comparator Register 14 */
-        uint32_t RESERVED29[1U];
-  __IOM uint32_t FUNCTION14;             /*!< Offset: 0x108 (R/W)  Function Register 14 */
-        uint32_t RESERVED30[1U];
-  __IOM uint32_t COMP15;                 /*!< Offset: 0x110 (R/W)  Comparator Register 15 */
-        uint32_t RESERVED31[1U];
-  __IOM uint32_t FUNCTION15;             /*!< Offset: 0x118 (R/W)  Function Register 15 */
-        uint32_t RESERVED32[934U];
-  __IM  uint32_t LSR;                    /*!< Offset: 0xFB4 (R  )  Lock Status Register */
-        uint32_t RESERVED33[1U];
-  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+        uint32_t RESERVED14[968U];
+  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+        uint32_t RESERVED15[3U];
+  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
 } DWT_Type;
 
 /* DWT Control Register Definitions */
@@ -1385,7 +1387,7 @@ typedef struct
 #define DWT_FUNCTION_DATAVSIZE_Msk         (0x3UL << DWT_FUNCTION_DATAVSIZE_Pos)       /*!< DWT FUNCTION: DATAVSIZE Mask */
 
 #define DWT_FUNCTION_ACTION_Pos             4U                                         /*!< DWT FUNCTION: ACTION Position */
-#define DWT_FUNCTION_ACTION_Msk            (0x1UL << DWT_FUNCTION_ACTION_Pos)          /*!< DWT FUNCTION: ACTION Mask */
+#define DWT_FUNCTION_ACTION_Msk            (0x3UL << DWT_FUNCTION_ACTION_Pos)          /*!< DWT FUNCTION: ACTION Mask */
 
 #define DWT_FUNCTION_MATCH_Pos              0U                                         /*!< DWT FUNCTION: MATCH Position */
 #define DWT_FUNCTION_MATCH_Msk             (0xFUL /*<< DWT_FUNCTION_MATCH_Pos*/)       /*!< DWT FUNCTION: MATCH Mask */
@@ -1556,37 +1558,116 @@ typedef struct
  */
 typedef struct
 {
-  __OM  uint32_t EVENTSPR;               /*!< Offset: 0x000 ( /W)  Event Set Pending Register */
-        uint32_t RESERVED0[31U];
-  __IM  uint32_t EVENTMASKA;             /*!< Offset: 0x080 (R/W)  Event Mask A Register */
-  __IM  uint32_t EVENTMASK[15];          /*!< Offset: 0x084 (R/W)  Event Mask Register */
+  __IOM uint32_t EWIC_CR;                /*!< Offset: 0x000 (R/W)  EWIC Control Register */
+  __IOM uint32_t EWIC_ASCR;              /*!< Offset: 0x004 (R/W)  EWIC Automatic Sequence Control Register */
+  __OM  uint32_t EWIC_CLRMASK;           /*!< Offset: 0x008 ( /W)  EWIC Clear Mask Register */
+  __IM  uint32_t EWIC_NUMID;             /*!< Offset: 0x00C (R/ )  EWIC Event Number ID Register */
+        uint32_t RESERVED0[124U];
+  __IOM uint32_t EWIC_MASKA;             /*!< Offset: 0x200 (R/W)  EWIC MaskA Register */
+  __IOM uint32_t EWIC_MASKn[15];         /*!< Offset: 0x204 (R/W)  EWIC Maskn Registers */
+        uint32_t RESERVED1[112U];
+  __IM  uint32_t EWIC_PENDA;             /*!< Offset: 0x400 (R/ )  EWIC PendA Event Register */
+  __IOM uint32_t EWIC_PENDn[15];         /*!< Offset: 0x404 (R/W)  EWIC Pendn Event Registers */
+        uint32_t RESERVED2[112U];
+  __IM  uint32_t EWIC_PSR;               /*!< Offset: 0x600 (R/ )  EWIC Pend Summary Register */
 } EWIC_Type;
 
-/* EWIC External Wakeup Interrupt Controller (EVENTSPR) Register Definitions */
-#define EWIC_EVENTSPR_EDBGREQ_Pos   2U                                                 /*!< EWIC EVENTSPR: EDBGREQ Position */
-#define EWIC_EVENTSPR_EDBGREQ_Msk  (0x1UL << EWIC_EVENTSPR_EDBGREQ_Pos)                /*!< EWIC EVENTSPR: EDBGREQ Mask */
+/* EWIC Control (EWIC_CR) Register Definitions */
+#define EWIC_EWIC_CR_EN_Pos                 0U                                         /*!< EWIC EWIC_CR: EN Position */
+#define EWIC_EWIC_CR_EN_Msk                (0x1UL /*<< EWIC_EWIC_CR_EN_Pos*/)          /*!< EWIC EWIC_CR: EN Mask */
 
-#define EWIC_EVENTSPR_NMI_Pos   1U                                                     /*!< EWIC EVENTSPR: NMI Position */
-#define EWIC_EVENTSPR_NMI_Msk  (0x1UL << EWIC_EVENTSPR_NMI_Pos)                        /*!< EWIC EVENTSPR: NMI Mask */
+/* EWIC Automatic Sequence Control (EWIC_ASCR) Register Definitions */
+#define EWIC_EWIC_ASCR_ASPU_Pos             1U                                         /*!< EWIC EWIC_ASCR: ASPU Position */
+#define EWIC_EWIC_ASCR_ASPU_Msk            (0x1UL << EWIC_EWIC_ASCR_ASPU_Pos)          /*!< EWIC EWIC_ASCR: ASPU Mask */
 
-#define EWIC_EVENTSPR_EVENT_Pos   0U                                                   /*!< EWIC EVENTSPR: EVENT Position */
-#define EWIC_EVENTSPR_EVENT_Msk  (0x1UL /*<< EWIC_EVENTSPR_EVENT_Pos*/)                /*!< EWIC EVENTSPR: EVENT Mask */
+#define EWIC_EWIC_ASCR_ASPD_Pos             0U                                         /*!< EWIC EWIC_ASCR: ASPD Position */
+#define EWIC_EWIC_ASCR_ASPD_Msk            (0x1UL /*<< EWIC_EWIC_ASCR_ASPD_Pos*/)      /*!< EWIC EWIC_ASCR: ASPD Mask */
 
-/* EWIC External Wakeup Interrupt Controller (EVENTMASKA) Register Definitions */
-#define EWIC_EVENTMASKA_EDBGREQ_Pos   2U                                               /*!< EWIC EVENTMASKA: EDBGREQ Position */
-#define EWIC_EVENTMASKA_EDBGREQ_Msk  (0x1UL << EWIC_EVENTMASKA_EDBGREQ_Pos)            /*!< EWIC EVENTMASKA: EDBGREQ Mask */
+/* EWIC Event Number ID (EWIC_NUMID) Register Definitions */
+#define EWIC_EWIC_NUMID_NUMEVENT_Pos        0U                                         /*!< EWIC_NUMID: NUMEVENT Position */
+#define EWIC_EWIC_NUMID_NUMEVENT_Msk       (0xFFFFUL /*<< EWIC_EWIC_NUMID_NUMEVENT_Pos*/) /*!< EWIC_NUMID: NUMEVENT Mask */
 
-#define EWIC_EVENTMASKA_NMI_Pos   1U                                                   /*!< EWIC EVENTMASKA: NMI Position */
-#define EWIC_EVENTMASKA_NMI_Msk  (0x1UL << EWIC_EVENTMASKA_NMI_Pos)                    /*!< EWIC EVENTMASKA: NMI Mask */
+/* EWIC MaskA (EWIC_MASKA) Register Definitions */
+#define EWIC_EWIC_MASKA_EDBGREQ_Pos         2U                                         /*!< EWIC EWIC_MASKA: EDBGREQ Position */
+#define EWIC_EWIC_MASKA_EDBGREQ_Msk        (0x1UL << EWIC_EWIC_MASKA_EDBGREQ_Pos)      /*!< EWIC EWIC_MASKA: EDBGREQ Mask */
 
-#define EWIC_EVENTMASKA_EVENT_Pos   0U                                                 /*!< EWIC EVENTMASKA: EVENT Position */
-#define EWIC_EVENTMASKA_EVENT_Msk  (0x1UL /*<< EWIC_EVENTMASKA_EVENT_Pos*/)            /*!< EWIC EVENTMASKA: EVENT Mask */
+#define EWIC_EWIC_MASKA_NMI_Pos             1U                                         /*!< EWIC EWIC_MASKA: NMI Position */
+#define EWIC_EWIC_MASKA_NMI_Msk            (0x1UL << EWIC_EWIC_MASKA_NMI_Pos)          /*!< EWIC EWIC_MASKA: NMI Mask */
 
-/* EWIC External Wakeup Interrupt Controller (EVENTMASK) Register Definitions */
-#define EWIC_EVENTMASK_IRQ_Pos   0U                                                    /*!< EWIC EVENTMASKA: IRQ Position */
-#define EWIC_EVENTMASK_IRQ_Msk  (0xFFFFFFFFUL /*<< EWIC_EVENTMASKA_IRQ_Pos*/)          /*!< EWIC EVENTMASKA: IRQ Mask */
+#define EWIC_EWIC_MASKA_EVENT_Pos           0U                                         /*!< EWIC EWIC_MASKA: EVENT Position */
+#define EWIC_EWIC_MASKA_EVENT_Msk          (0x1UL /*<< EWIC_EWIC_MASKA_EVENT_Pos*/)    /*!< EWIC EWIC_MASKA: EVENT Mask */
+
+/* EWIC Mask n (EWIC_MASKn) Register Definitions */
+#define EWIC_EWIC_MASKn_IRQ_Pos             0U                                           /*!< EWIC EWIC_MASKn: IRQ Position */
+#define EWIC_EWIC_MASKn_IRQ_Msk            (0xFFFFFFFFUL /*<< EWIC_EWIC_MASKn_IRQ_Pos*/) /*!< EWIC EWIC_MASKn: IRQ Mask */
+
+/* EWIC PendA (EWIC_PENDA) Register Definitions */
+#define EWIC_EWIC_PENDA_EDBGREQ_Pos         2U                                         /*!< EWIC EWIC_PENDA: EDBGREQ Position */
+#define EWIC_EWIC_PENDA_EDBGREQ_Msk        (0x1UL << EWIC_EWIC_PENDA_EDBGREQ_Pos)      /*!< EWIC EWIC_PENDA: EDBGREQ Mask */
+
+#define EWIC_EWIC_PENDA_NMI_Pos             1U                                         /*!< EWIC EWIC_PENDA: NMI Position */
+#define EWIC_EWIC_PENDA_NMI_Msk            (0x1UL << EWIC_EWIC_PENDA_NMI_Pos)          /*!< EWIC EWIC_PENDA: NMI Mask */
+
+#define EWIC_EWIC_PENDA_EVENT_Pos           0U                                         /*!< EWIC EWIC_PENDA: EVENT Position */
+#define EWIC_EWIC_PENDA_EVENT_Msk          (0x1UL /*<< EWIC_EWIC_PENDA_EVENT_Pos*/)    /*!< EWIC EWIC_PENDA: EVENT Mask */
+
+/* EWIC Pend n (EWIC_PENDn) Register Definitions */
+#define EWIC_EWIC_PENDn_IRQ_Pos             0U                                           /*!< EWIC EWIC_PENDn: IRQ Position */
+#define EWIC_EWIC_PENDn_IRQ_Msk            (0xFFFFFFFFUL /*<< EWIC_EWIC_PENDn_IRQ_Pos*/) /*!< EWIC EWIC_PENDn: IRQ Mask */
+
+/* EWIC Pend Summary (EWIC_PSR) Register Definitions */
+#define EWIC_EWIC_PSR_NZ_Pos                1U                                         /*!< EWIC EWIC_PSR: NZ Position */
+#define EWIC_EWIC_PSR_NZ_Msk               (0x7FFFUL << EWIC_EWIC_PSR_NZ_Pos)          /*!< EWIC EWIC_PSR: NZ Mask */
+
+#define EWIC_EWIC_PSR_NZA_Pos               0U                                         /*!< EWIC EWIC_PSR: NZA Position */
+#define EWIC_EWIC_PSR_NZA_Msk              (0x1UL /*<< EWIC_EWIC_PSR_NZA_Pos*/)        /*!< EWIC EWIC_PSR: NZA Mask */
 
 /*@}*/ /* end of group EWIC_Type */
+
+
+/**
+  \ingroup  CMSIS_core_register
+  \defgroup EWIC_ISA_Type     External Wakeup Interrupt Controller (EWIC) interrupt status access registers
+  \brief    Type definitions for the External Wakeup Interrupt Controller interrupt status access registers (EWIC_ISA)
+  @{
+ */
+
+/**
+  \brief  Structure type to access the External Wakeup Interrupt Controller interrupt status access registers (EWIC_ISA).
+ */
+typedef struct
+{
+  __OM  uint32_t EVENTSPR;               /*!< Offset: 0x000 ( /W)  Event Set Pending Register */
+        uint32_t RESERVED0[31U];
+  __IM  uint32_t EVENTMASKA;             /*!< Offset: 0x080 (R/ )  Event Mask A Register */
+  __IM  uint32_t EVENTMASKn[15];         /*!< Offset: 0x084 (R/ )  Event Mask Register */
+} EWIC_ISA_Type;
+
+/* EWIC_ISA Event Set Pending (EVENTSPR) Register Definitions */
+#define EWIC_ISA_EVENTSPR_EDBGREQ_Pos   2U                                             /*!< EWIC_ISA EVENTSPR: EDBGREQ Position */
+#define EWIC_ISA_EVENTSPR_EDBGREQ_Msk  (0x1UL << EWIC_ISA_EVENTSPR_EDBGREQ_Pos)        /*!< EWIC_ISA EVENTSPR: EDBGREQ Mask */
+
+#define EWIC_ISA_EVENTSPR_NMI_Pos   1U                                                 /*!< EWIC_ISA EVENTSPR: NMI Position */
+#define EWIC_ISA_EVENTSPR_NMI_Msk  (0x1UL << EWIC_ISA_EVENTSPR_NMI_Pos)                /*!< EWIC_ISA EVENTSPR: NMI Mask */
+
+#define EWIC_ISA_EVENTSPR_EVENT_Pos   0U                                               /*!< EWIC_ISA EVENTSPR: EVENT Position */
+#define EWIC_ISA_EVENTSPR_EVENT_Msk  (0x1UL /*<< EWIC_ISA_EVENTSPR_EVENT_Pos*/)        /*!< EWIC_ISA EVENTSPR: EVENT Mask */
+
+/* EWIC_ISA Event Mask A (EVENTMASKA) Register Definitions */
+#define EWIC_ISA_EVENTMASKA_EDBGREQ_Pos   2U                                           /*!< EWIC_ISA EVENTMASKA: EDBGREQ Position */
+#define EWIC_ISA_EVENTMASKA_EDBGREQ_Msk  (0x1UL << EWIC_ISA_EVENTMASKA_EDBGREQ_Pos)    /*!< EWIC_ISA EVENTMASKA: EDBGREQ Mask */
+
+#define EWIC_ISA_EVENTMASKA_NMI_Pos   1U                                               /*!< EWIC_ISA EVENTMASKA: NMI Position */
+#define EWIC_ISA_EVENTMASKA_NMI_Msk  (0x1UL << EWIC_ISA_EVENTMASKA_NMI_Pos)            /*!< EWIC_ISA EVENTMASKA: NMI Mask */
+
+#define EWIC_ISA_EVENTMASKA_EVENT_Pos   0U                                             /*!< EWIC_ISA EVENTMASKA: EVENT Position */
+#define EWIC_ISA_EVENTMASKA_EVENT_Msk  (0x1UL /*<< EWIC_ISA_EVENTMASKA_EVENT_Pos*/)    /*!< EWIC_ISA EVENTMASKA: EVENT Mask */
+
+/* EWIC_ISA Event Mask n (EVENTMASKn) Register Definitions */
+#define EWIC_ISA_EVENTMASKn_IRQ_Pos   0U                                                /*!< EWIC_ISA EVENTMASKn: IRQ Position */
+#define EWIC_ISA_EVENTMASKn_IRQ_Msk  (0xFFFFFFFFUL /*<< EWIC_ISA_EVENTMASKn_IRQ_Pos*/)  /*!< EWIC_ISA EVENTMASKn: IRQ Mask */
+
+/*@}*/ /* end of group EWIC_ISA_Type */
 
 
 /**
@@ -1693,7 +1774,7 @@ typedef struct
 #define ERRBNK_TEBR0_TYPE_Msk              (0x1UL << ERRBNK_TEBR0_TYPE_Pos)            /*!< ERRBNK TEBR0: TYPE Mask */
 
 #define ERRBNK_TEBR0_BANK_Pos              24U                                         /*!< ERRBNK TEBR0: BANK Position */
-#define ERRBNK_TEBR0_BANK_Msk              (0x3UL << ERRBNK_TEBR0_BANK_Pos)            /*!< ERRBNK TEBR0: BANK Mask */
+#define ERRBNK_TEBR0_BANK_Msk              (0x7UL << ERRBNK_TEBR0_BANK_Pos)            /*!< ERRBNK TEBR0: BANK Mask */
 
 #define ERRBNK_TEBR0_LOCATION_Pos           2U                                         /*!< ERRBNK TEBR0: LOCATION Position */
 #define ERRBNK_TEBR0_LOCATION_Msk          (0x3FFFFFUL << ERRBNK_TEBR0_LOCATION_Pos)   /*!< ERRBNK TEBR0: LOCATION Mask */
@@ -1715,7 +1796,7 @@ typedef struct
 #define ERRBNK_TEBR1_TYPE_Msk              (0x1UL << ERRBNK_TEBR1_TYPE_Pos)            /*!< ERRBNK TEBR1: TYPE Mask */
 
 #define ERRBNK_TEBR1_BANK_Pos              24U                                         /*!< ERRBNK TEBR1: BANK Position */
-#define ERRBNK_TEBR1_BANK_Msk              (0x3UL << ERRBNK_TEBR1_BANK_Pos)            /*!< ERRBNK TEBR1: BANK Mask */
+#define ERRBNK_TEBR1_BANK_Msk              (0x7UL << ERRBNK_TEBR1_BANK_Pos)            /*!< ERRBNK TEBR1: BANK Mask */
 
 #define ERRBNK_TEBR1_LOCATION_Pos           2U                                         /*!< ERRBNK TEBR1: LOCATION Position */
 #define ERRBNK_TEBR1_LOCATION_Msk          (0x3FFFFFUL << ERRBNK_TEBR1_LOCATION_Pos)   /*!< ERRBNK TEBR1: LOCATION Mask */
@@ -3385,26 +3466,12 @@ typedef struct
  */
 typedef struct
 {
-  __OM  uint32_t DLAR;                   /*!< Offset: 0x000 ( /W)  SCS Software Lock Access Register */
-  __IM  uint32_t DLSR;                   /*!< Offset: 0x004 (R/ )  SCS Software Lock Status Register */
+        uint32_t RESERVED0[2U];
   __IM  uint32_t DAUTHSTATUS;            /*!< Offset: 0x008 (R/ )  Debug Authentication Status Register */
   __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
-  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x010 (R/ )  SCS Device Type Register */
+        uint32_t RESERVED1[3U];
+  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x01C (R/ )  SCS Device Type Register */
 } DIB_Type;
-
-/* DLAR, SCS Software Lock Access Register Definitions */
-#define DIB_DLAR_KEY_Pos                    0U                                            /*!< DIB DLAR: KEY Position */
-#define DIB_DLAR_KEY_Msk                   (0xFFFFFFFFUL /*<< DIB_DLAR_KEY_Pos */)        /*!< DIB DLAR: KEY Mask */
-
-/* DLSR, SCS Software Lock Status Register Definitions */
-#define DIB_DLSR_nTT_Pos                    2U                                            /*!< DIB DLSR: Not thirty-two bit Position */
-#define DIB_DLSR_nTT_Msk                   (0x1UL << DIB_DLSR_nTT_Pos )                   /*!< DIB DLSR: Not thirty-two bit Mask */
-
-#define DIB_DLSR_SLK_Pos                    1U                                            /*!< DIB DLSR: Software Lock status Position */
-#define DIB_DLSR_SLK_Msk                   (0x1UL << DIB_DLSR_SLK_Pos )                   /*!< DIB DLSR: Software Lock status Mask */
-
-#define DIB_DLSR_SLI_Pos                    0U                                            /*!< DIB DLSR: Software Lock implemented Position */
-#define DIB_DLSR_SLI_Msk                   (0x1UL /*<< DIB_DLSR_SLI_Pos*/)                /*!< DIB DLSR: Software Lock implemented Mask */
 
 /* DAUTHSTATUS, Debug Authentication Status Register Definitions */
 #define DIB_DAUTHSTATUS_SUNID_Pos          22U                                            /*!< DIB DAUTHSTATUS: Secure Unprivileged Non-invasive Debug Allowed Position */
@@ -3498,9 +3565,10 @@ typedef struct
   #define MEMSYSCTL_BASE      (0xE001E000UL)                             /*!< Memory System Control Base Address */
   #define ERRBNK_BASE         (0xE001E100UL)                             /*!< Error Banking Base Address */
   #define PWRMODCTL_BASE      (0xE001E300UL)                             /*!< Power Mode Control Base Address */
-  #define EWIC_BASE           (0xE001E400UL)                             /*!< External Wakeup Interrupt Controller Base Address */
+  #define EWIC_ISA_BASE       (0xE001E400UL)                             /*!< External Wakeup Interrupt Controller interrupt status access Base Address */
   #define PRCCFGINF_BASE      (0xE001E700UL)                             /*!< Processor Configuration Information Base Address */
   #define TPI_BASE            (0xE0040000UL)                             /*!< TPI Base Address */
+  #define EWIC_BASE           (0xE0047000UL)                             /*!< External Wakeup Interrupt Controller Base Address */
   #define CoreDebug_BASE      (0xE000EDF0UL)                             /*!< \deprecated Core Debug Base Address */
   #define DCB_BASE            (0xE000EDF0UL)                             /*!< DCB Base Address */
   #define DIB_BASE            (0xE000EFB0UL)                             /*!< DIB Base Address */
@@ -3518,6 +3586,7 @@ typedef struct
   #define MEMSYSCTL           ((MemSysCtl_Type *)     MEMSYSCTL_BASE   ) /*!< Memory System Control configuration struct */
   #define ERRBNK              ((ErrBnk_Type    *)     ERRBNK_BASE      ) /*!< Error Banking configuration struct */
   #define PWRMODCTL           ((PwrModCtl_Type *)     PWRMODCTL_BASE   ) /*!< Power Mode Control configuration struct */
+  #define EWIC_ISA            ((EWIC_ISA_Type  *)     EWIC_ISA_BASE    ) /*!< EWIC interrupt status access struct */
   #define EWIC                ((EWIC_Type      *)     EWIC_BASE        ) /*!< EWIC configuration struct */
   #define PRCCFGINF           ((PrcCfgInf_Type *)     PRCCFGINF_BASE   ) /*!< Processor Configuration Information configuration struct */
   #define CoreDebug           ((CoreDebug_Type *)     CoreDebug_BASE   ) /*!< \deprecated Core Debug configuration struct */
@@ -4278,6 +4347,42 @@ __STATIC_INLINE uint32_t TZ_NVIC_GetPriority_NS(IRQn_Type IRQn)
 #define ARMCM85_PMU_AXI_READ_ACCESS                  0xC303             /*!< Any beat access to M-AXI read interface */
 #define ARMCM85_PMU_DOSTIMEOUT_DOUBLE                0xC400             /*!< Denial of Service timeout has fired twice and caused buffers to drain to allow forward progress */
 #define ARMCM85_PMU_DOSTIMEOUT_TRIPLE                0xC401             /*!< Denial of Service timeout has fired three times and blocked the LSU to force forward progress */
+#define ARMCM85_PMU_FUSED_INST_RETIRED               0xC500             /*!< Fused instructions architecturally executed */
+#define ARMCM85_PMU_BR_INDIRECT                      0xC501             /*!< Indirect branch instruction architecturally executed */
+#define ARMCM85_PMU_BTAC_HIT                         0xC502             /*!< BTAC branch predictor hit */
+#define ARMCM85_PMU_BTAC_HIT_RETURNS                 0xC503             /*!< Return branch hits BTAC */
+#define ARMCM85_PMU_BTAC_HIT_CALLS                   0xC504             /*!< Call branch hits BTAC */
+#define ARMCM85_PMU_BTAC_HIT_INDIRECT                0xC505             /*!< Indirect branch hits BTACT */
+#define ARMCM85_PMU_BTAC_NEW_ALLOC                   0xC506             /*!< New allocation to BTAC */
+#define ARMCM85_PMU_BR_IND_MIS_PRED                  0xC507             /*!< Indirect branch mis-predicted */
+#define ARMCM85_PMU_BR_RETURN_MIS_PRED               0xC508             /*!< Return branch mis-predicted */
+#define ARMCM85_PMU_BR_BTAC_OFFSET_OVERFLOW          0xC509             /*!< Branch does not allocate in BTAC due to offset overflow */
+#define ARMCM85_PMU_STB_FULL_STALL_AXI               0xC50A             /*!< STore Buffer (STB) full with AXI requests causing CPU to stall */
+#define ARMCM85_PMU_STB_FULL_STALL_TCM               0xC50B             /*!< STB full with TCM requests causing CPU to stall */
+#define ARMCM85_PMU_CPU_STALLED_AHBS                 0xC50C             /*!< CPU is stalled because TCM access through AHBS */
+#define ARMCM85_PMU_AHBS_STALLED_CPU                 0xC50D             /*!< AHBS is stalled due to TCM access by CPU */
+#define ARMCM85_PMU_BR_INTERSTATING_MIS_PRED         0xC50E             /*!< Inter-stating branch is mis-predicted. */
+#define ARMCM85_PMU_DWT_STALL                        0xC50F             /*!< Data Watchpoint and Trace (DWT) stall */
+#define ARMCM85_PMU_DWT_FLUSH                        0xC510             /*!< DWT flush */
+#define ARMCM85_PMU_ETM_STALL                        0xC511             /*!< Embedded Trace Macrocell (ETM) stall */
+#define ARMCM85_PMU_ETM_FLUSH                        0xC512             /*!< ETM flush */
+#define ARMCM85_PMU_ADDRESS_BANK_CONFLICT            0xC513             /*!< Bank conflict prevents memory instruction dual issue */
+#define ARMCM85_PMU_BLOCKED_DUAL_ISSUE               0xC514             /*!< Dual instruction issuing is prevented */
+#define ARMCM85_PMU_FP_CONTEXT_TRIGGER               0xC515             /*!< Floating Point Context is created */
+#define ARMCM85_PMU_TAIL_CHAIN                       0xC516             /*!< New exception is handled without first unstacking */
+#define ARMCM85_PMU_LATE_ARRIVAL                     0xC517             /*!< Late-arriving exception taken during exception entry */
+#define ARMCM85_PMU_INT_STALL_FAULT                  0xC518             /*!< Delayed exception entry due to ongoing fault processing */
+#define ARMCM85_PMU_INT_STALL_DEV                    0xC519             /*!< Delayed exception entry due to outstanding device access */
+#define ARMCM85_PMU_PAC_STALL                        0xC51A             /*!< Stall caused by authentication code computation */
+#define ARMCM85_PMU_PAC_RETIRED                      0xC51B             /*!< PAC instruction architecturally executed */
+#define ARMCM85_PMU_AUT_RETIRED                      0xC51C             /*!< AUT instruction architecturally executed */
+#define ARMCM85_PMU_BTI_RETIRED                      0xC51D             /*!< BTI instruction architecturally executed */
+#define ARMCM85_PMU_PF_NL_MODE                       0xC51E             /*!< Prefetch in next line mode */
+#define ARMCM85_PMU_PF_STREAM_MODE                   0xC51F             /*!< Prefetch in stream mode */
+#define ARMCM85_PMU_PF_BUFF_CACHE_HIT                0xC520             /*!< Prefetch request that hit in the cache */
+#define ARMCM85_PMU_PF_REQ_LFB_HIT                   0xC521             /*!< Prefetch request that hit in line fill buffers */
+#define ARMCM85_PMU_PF_BUFF_FULL                     0xC522             /*!< Number of times prefetch buffer is full */
+#define ARMCM85_PMU_PF_REQ_DCACHE_HIT                0xC523             /*!< Generated prefetch request address that hit in D-Cache */
 
 #endif
 
